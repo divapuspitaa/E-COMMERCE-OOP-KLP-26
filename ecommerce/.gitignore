@@ -3,19 +3,16 @@
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
-# Database (dibuat otomatis)
-*.db
-*.sqlite
-
 # IDE
 .idea/
 *.iml
-.vscode/settings.json
-out/
+.vscode/
+*.class
+*.jar
+
+# DB
+*.db
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log

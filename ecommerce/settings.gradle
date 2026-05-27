@@ -1,1 +1,8 @@
-rootProject.name = 'NusantaraShop'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'AetherCart26'
+include('app')

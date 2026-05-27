@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="test.woi.controller.HomeController"
+            minWidth="1024" minHeight="700">
+
+    <!-- ══ NAVBAR ══ -->
+    <top>
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="16">
+            <!-- Brand -->
+            <VBox spacing="0">
+                <Label text="🛍 AetherCart 26" styleClass="navbar-brand"/>
+                <Label text="Produk Lokal Terbaik" styleClass="navbar-brand-sub"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Search -->
+            <HBox spacing="0" alignment="CENTER">
+                <TextField fx:id="txtSearch" promptText="🔍  Cari produk..." styleClass="search-field"
+                           onAction="#handleSearch"/>
+                <Button text="Cari" styleClass="btn-primary" onAction="#handleSearch"
+                        style="-fx-background-radius:0 8 8 0;-fx-padding:10 16;"/>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Nav Links -->
+            <Button text="🏠 Beranda" styleClass="navbar-btn, navbar-btn-active" onAction="#handleHome"/>
+            <Button text="📦 Pesanan" styleClass="navbar-btn" onAction="#handleOrders"/>
+            <Button text="👤 Profil" styleClass="navbar-btn" onAction="#handleProfile"/>
+
+            <!-- Cart Button -->
+            <StackPane>
+                <Button fx:id="btnCart" text="🛒 Keranjang" styleClass="cart-btn" onAction="#handleCart"/>
+                <Label fx:id="lblCartCount" text="0" styleClass="label-badge"
+                       alignment="TOP_RIGHT" translateX="40" translateY="-14"
+                       visible="false" managed="false"/>
+            </StackPane>
+
+            <!-- Logout -->
+            <Button text="Keluar" styleClass="btn-ghost"
+                    style="-fx-text-fill:rgba(255,255,255,0.7);" onAction="#handleLogout"/>
+        </HBox>
+    </top>
+
+    <!-- ══ MAIN CONTENT ══ -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane" pannable="true">
+            <VBox spacing="24" style="-fx-padding:24;">
+
+                <!-- Hero Banner -->
+                <StackPane styleClass="hero-banner" prefHeight="180">
+                    <HBox alignment="CENTER_LEFT" spacing="24">
+                        <VBox spacing="10" alignment="CENTER_LEFT" maxWidth="500">
+                            <Label text="Selamat Berbelanja di AetherCart 26!" 
+                                   style="-fx-font-size:24px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+                            <Label text="Temukan ribuan produk lokal berkualitas dari seluruh Nusantara" 
+                                   style="-fx-font-size:13px;-fx-text-fill:rgba(255,255,255,0.85);-fx-wrap-text:true;"/>
+                            <HBox spacing="10">
+                                <Label text="✓ Produk Lokal" style="-fx-text-fill:#F39C12;-fx-font-size:12px;-fx-font-weight:bold;"/>
+                                <Label text="✓ Aman &amp; Terpercaya" style="-fx-text-fill:#F39C12;-fx-font-size:12px;-fx-font-weight:bold;"/>
+                                <Label text="✓ Gratis Ongkir Produk Digital" style="-fx-text-fill:#F39C12;-fx-font-size:12px;-fx-font-weight:bold;"/>
+                            </HBox>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="🛍" style="-fx-font-size:80px;"/>
+                    </HBox>
+                </StackPane>
+
+                <!-- Welcome + Saldo -->
+                <HBox spacing="16" alignment="CENTER_LEFT">
+                    <VBox spacing="2">
+                        <Label fx:id="lblWelcome" text="Halo, Pengguna!" 
+                               style="-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        <Label fx:id="lblBalance" text="Saldo: Rp 0"
+                               style="-fx-font-size:13px;-fx-text-fill:#27AE60;-fx-font-weight:bold;"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblProductCount" text="0 produk tersedia"
+                           style="-fx-font-size:12px;-fx-text-fill:#6C757D;"/>
+                </HBox>
+
+                <!-- Category Filter -->
+                <VBox spacing="10">
+                    <Label text="Kategori" style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                    <ScrollPane fitToHeight="true" prefHeight="52" maxHeight="52" style="-fx-border-color:transparent;-fx-background-color:transparent;">
+                        <HBox fx:id="categoryBox" spacing="10" alignment="CENTER_LEFT" style="-fx-padding:4 0;"/>
+                    </ScrollPane>
+                </VBox>
+
+                <!-- Product Grid -->
+                <VBox spacing="14">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label fx:id="lblSectionTitle" text="Semua Produk"
+                               style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <ComboBox fx:id="cmbSort" promptText="Urutkan"
+                                  style="-fx-font-size:12px;" onAction="#handleSort"/>
+                    </HBox>
+                    <FlowPane fx:id="productGrid" hgap="16" vgap="16" prefWrapLength="900"/>
+                    <Label fx:id="lblNoProduct" text="😕 Tidak ada produk ditemukan."
+                           style="-fx-font-size:14px;-fx-text-fill:#ADB5BD;" visible="false" managed="false"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

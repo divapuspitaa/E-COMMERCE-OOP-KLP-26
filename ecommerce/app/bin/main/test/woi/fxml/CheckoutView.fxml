@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="test.woi.controller.CheckoutController"
+            minWidth="900" minHeight="640">
+
+    <!-- Non-visual components -->
+    <fx:define>
+        <ToggleGroup fx:id="paymentGroup"/>
+    </fx:define>
+
+    <!-- NAVBAR -->
+    <top>
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="16">
+            <Label text="🛍 AetherCart 26" styleClass="navbar-brand"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="← Kembali ke Keranjang" styleClass="navbar-btn" onAction="#handleBack"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <HBox spacing="24" style="-fx-padding:28;" alignment="TOP_CENTER">
+
+                <!-- LEFT: Form Checkout -->
+                <VBox spacing="20" HBox.hgrow="ALWAYS" maxWidth="560">
+
+                    <Label text="📋 Detail Pemesanan" style="-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+
+                    <!-- Shipping Address -->
+                    <VBox styleClass="card" spacing="14">
+                        <Label text="📍 Alamat Pengiriman" style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        <VBox spacing="5">
+                            <Label text="Nama Penerima" styleClass="form-label"/>
+                            <TextField fx:id="txtRecipient" promptText="Nama penerima paket" styleClass="text-field" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="5">
+                            <Label text="No. Telepon" styleClass="form-label"/>
+                            <TextField fx:id="txtPhone" promptText="08xx-xxxx-xxxx" styleClass="text-field" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="5">
+                            <Label text="Alamat Lengkap *" styleClass="form-label"/>
+                            <TextArea fx:id="txtAddress" promptText="Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan..."
+                                      prefRowCount="3" maxWidth="Infinity"
+                                      style="-fx-background-color:white;-fx-border-color:#DEE2E6;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10 14;-fx-font-size:13px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Payment Method -->
+                    <VBox styleClass="card" spacing="14">
+                        <Label text="💳 Metode Pembayaran" style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+
+                        <VBox spacing="10">
+                            <HBox spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-background-color:#F8F9FA;-fx-background-radius:8;-fx-padding:12;">
+                                <RadioButton fx:id="rbSaldo" text="" toggleGroup="$paymentGroup" userData="SALDO"/>
+                                <VBox spacing="2">
+                                    <Label text="💰 Bayar dengan Saldo AetherCart 26" style="-fx-font-weight:bold;-fx-font-size:13px;"/>
+                                    <Label fx:id="lblSaldoInfo" text="Saldo Anda: Rp 0" style="-fx-font-size:12px;-fx-text-fill:#27AE60;"/>
+                                </VBox>
+                            </HBox>
+
+                            <HBox spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-background-color:#F8F9FA;-fx-background-radius:8;-fx-padding:12;">
+                                <RadioButton fx:id="rbTransfer" text="" toggleGroup="$paymentGroup" userData="TRANSFER"/>
+                                <VBox spacing="2">
+                                    <Label text="🏦 Transfer Bank" style="-fx-font-weight:bold;-fx-font-size:13px;"/>
+                                    <Label text="BCA / Mandiri / BNI / BRI" style="-fx-font-size:12px;-fx-text-fill:#6C757D;"/>
+                                </VBox>
+                            </HBox>
+
+                            <HBox spacing="12" alignment="CENTER_LEFT"
+                                  style="-fx-background-color:#F8F9FA;-fx-background-radius:8;-fx-padding:12;">
+                                <RadioButton fx:id="rbCOD" text="" toggleGroup="$paymentGroup" userData="COD"/>
+                                <VBox spacing="2">
+                                    <Label text="🚪 COD (Bayar di Tempat)" style="-fx-font-weight:bold;-fx-font-size:13px;"/>
+                                    <Label text="Tersedia untuk area tertentu" style="-fx-font-size:12px;-fx-text-fill:#6C757D;"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Notes -->
+                    <VBox styleClass="card" spacing="10">
+                        <Label text="📝 Catatan Pesanan (Opsional)" style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        <TextArea fx:id="txtNotes" promptText="Tulis pesan untuk penjual..."
+                                  prefRowCount="2" maxWidth="Infinity"
+                                  style="-fx-background-color:white;-fx-border-color:#DEE2E6;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10 14;-fx-font-size:13px;"/>
+                    </VBox>
+
+                </VBox>
+
+                <!-- RIGHT: Order Summary -->
+                <VBox spacing="14" minWidth="300" maxWidth="320">
+
+                    <!-- Items Summary -->
+                    <VBox styleClass="card" spacing="12">
+                        <Label text="🛒 Item Pesanan" style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        <Separator/>
+                        <VBox fx:id="itemSummaryBox" spacing="8"/>
+                    </VBox>
+
+                    <!-- Price Summary -->
+                    <VBox styleClass="cart-summary-box" spacing="12">
+                        <Label text="Rincian Biaya" style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        <Separator/>
+                        <HBox>
+                            <Label text="Subtotal" style="-fx-text-fill:#495057;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblSubtotal" text="Rp 0" style="-fx-font-weight:bold;"/>
+                        </HBox>
+                        <HBox>
+                            <Label text="Ongkos Kirim" style="-fx-text-fill:#495057;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblShipping" text="Rp 15.000" style="-fx-font-weight:bold;"/>
+                        </HBox>
+                        <Separator/>
+                        <HBox>
+                            <Label text="TOTAL BAYAR" style="-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblTotal" text="Rp 0" style="-fx-font-size:17px;-fx-font-weight:bold;-fx-text-fill:#C0392B;"/>
+                        </HBox>
+
+                        <!-- Error/Info label -->
+                        <Label fx:id="lblError" text="" wrapText="true" maxWidth="280"
+                               style="-fx-text-fill:#C0392B;-fx-font-size:12px;" visible="false" managed="false"/>
+
+                        <Button fx:id="btnOrder" text="✅ Buat Pesanan" styleClass="btn-primary"
+                                maxWidth="Infinity" onAction="#handlePlaceOrder"
+                                style="-fx-font-size:14px;-fx-padding:13 0;"/>
+
+                        <Label text="🔒 Transaksi aman dan terenkripsi"
+                               style="-fx-font-size:11px;-fx-text-fill:#6C757D;" wrapText="true"/>
+                    </VBox>
+                </VBox>
+
+            </HBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
