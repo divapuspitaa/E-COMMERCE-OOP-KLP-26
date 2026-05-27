@@ -1,19 +1,23 @@
 package test.woi.controller;
 
-import test.woi.model.Order;
-import test.woi.service.OrderService;
-import test.woi.util.SceneManager;
-import test.woi.util.SessionManager;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
-
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import test.woi.model.Order;
+import test.woi.service.OrderService;
+import test.woi.util.SceneManager;
+import test.woi.util.SessionManager;
 
 public class AdminOrdersController {
 
@@ -124,6 +128,8 @@ public class AdminOrdersController {
     @FXML private void handleProducts()  { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_PRODUCTS); }
     @FXML private void handleUsers()     { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_USERS); }
     @FXML private void handleRefreshOrders() { loadOrders(); }
+
+    @FXML private void handleSellerProfile() { SceneManager.getInstance().switchTo(SceneManager.SceneName.SELLER_PROFILE); }
 
     @FXML
     private void handleLogout() {

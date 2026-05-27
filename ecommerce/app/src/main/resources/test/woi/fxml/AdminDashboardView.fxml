@@ -33,6 +33,7 @@
                         maxWidth="Infinity" onAction="#handleOrders"/>
                 <Button text="👥  Pengguna" styleClass="sidebar-item"
                         maxWidth="Infinity" onAction="#handleUsers"/>
+                <Button text="⚙️  Profil Saya" styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleSellerProfile"/>
             </VBox>
 
             <Region VBox.vgrow="ALWAYS"/>

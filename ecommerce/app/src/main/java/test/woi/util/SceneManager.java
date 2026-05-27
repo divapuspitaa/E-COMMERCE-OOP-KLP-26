@@ -1,13 +1,13 @@
 package test.woi.util;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * SceneManager - mengelola navigasi antar scene dalam aplikasi.
@@ -27,7 +27,8 @@ public class SceneManager {
         ADMIN_DASHBOARD,
         ADMIN_PRODUCTS,
         ADMIN_ORDERS,
-        ADMIN_USERS
+        ADMIN_USERS,
+        SELLER_PROFILE
     }
 
     private static SceneManager instance;
@@ -48,6 +49,7 @@ public class SceneManager {
         fxmlPaths.put(SceneName.ADMIN_PRODUCTS,  "/test/woi/fxml/AdminProductsView.fxml");
         fxmlPaths.put(SceneName.ADMIN_ORDERS,    "/test/woi/fxml/AdminOrdersView.fxml");
         fxmlPaths.put(SceneName.ADMIN_USERS,     "/test/woi/fxml/AdminUsersView.fxml");
+        fxmlPaths.put(SceneName.SELLER_PROFILE, "/test/woi/fxml/SellerProfileView.fxml");
     }
 
     public static synchronized SceneManager getInstance() {

@@ -1,18 +1,27 @@
 package test.woi.controller;
 
-import test.woi.dao.UserDAO;
-import test.woi.model.User;
-import test.woi.util.SceneManager;
-import test.woi.util.SessionManager;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
+import test.woi.dao.UserDAO;
+import test.woi.model.User;
+import test.woi.util.SceneManager;
+import test.woi.util.SessionManager;
 
 public class AdminUsersController {
 
@@ -73,19 +82,41 @@ public class AdminUsersController {
             }
         });
 
+        // Kolom Aksi: tombol Toggle Aktif/Nonaktif + tombol Hapus
         colActions.setCellFactory(col -> new TableCell<>() {
             final Button btnToggle = new Button();
+            final Button btnHapus  = new Button("🗑 Hapus");
+            final HBox   box       = new HBox(6, btnToggle, btnHapus);
+
             {
-                btnToggle.setStyle("-fx-padding:4 10;-fx-font-size:11px;");
+                btnToggle.setStyle("-fx-padding:4 8;-fx-font-size:11px;");
+                btnHapus.setStyle("-fx-padding:4 8;-fx-font-size:11px;" +
+                        "-fx-background-color:#E74C3C;-fx-text-fill:white;" +
+                        "-fx-background-radius:6;-fx-cursor:hand;");
+                btnHapus.setOnMouseEntered(e ->
+                        btnHapus.setStyle("-fx-padding:4 8;-fx-font-size:11px;" +
+                                "-fx-background-color:#C0392B;-fx-text-fill:white;" +
+                                "-fx-background-radius:6;-fx-cursor:hand;"));
+                btnHapus.setOnMouseExited(e ->
+                        btnHapus.setStyle("-fx-padding:4 8;-fx-font-size:11px;" +
+                                "-fx-background-color:#E74C3C;-fx-text-fill:white;" +
+                                "-fx-background-radius:6;-fx-cursor:hand;"));
             }
 
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty) { setGraphic(null); return; }
+
                 User u = getTableView().getItems().get(getIndex());
                 String selfId = SessionManager.getInstance().getCurrentUser().getId();
-                if (u.getId().equals(selfId)) { setGraphic(new Label("(Anda)")); return; }
 
+                // Akun sendiri tidak bisa dihapus/diubah dari sini
+                if (u.getId().equals(selfId)) {
+                    setGraphic(new Label("(Anda)"));
+                    return;
+                }
+
+                // Tombol toggle aktif/nonaktif
                 btnToggle.setText(u.isActive() ? "🔴 Nonaktifkan" : "🟢 Aktifkan");
                 btnToggle.getStyleClass().clear();
                 btnToggle.getStyleClass().add(u.isActive() ? "btn-danger" : "btn-success");
@@ -94,12 +125,42 @@ public class AdminUsersController {
                     userDAO.update(u);
                     tableUsers.refresh();
                 });
-                setGraphic(btnToggle);
+
+                // Tombol hapus akun
+                btnHapus.setOnAction(e -> handleDeleteUser(u));
+
+                setGraphic(box);
                 setPadding(new Insets(4));
             }
         });
 
         tableUsers.setItems(userData);
+    }
+
+    private void handleDeleteUser(User u) {
+        String nama = u.getFullName() != null ? u.getFullName() : u.getUsername();
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Hapus Akun");
+        confirm.setHeaderText("Hapus akun \"" + nama + "\" (@" + u.getUsername() + ")?");
+        confirm.setContentText("Tindakan ini tidak dapat dibatalkan.\nSemua data akun akan dihapus permanen.");
+        confirm.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Ubah teks tombol OK menjadi "Ya, Hapus"
+        ((Button) confirm.getDialogPane().lookupButton(ButtonType.OK)).setText("Ya, Hapus");
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean success = userDAO.deleteById(u.getId());
+            if (success) {
+                userData.remove(u);
+                allUsers.remove(u);
+                lblCount.setText(userData.size() + " pengguna");
+                showInfo("Akun @" + u.getUsername() + " berhasil dihapus.");
+            } else {
+                showError("Gagal menghapus akun. Coba lagi.");
+            }
+        }
     }
 
     private void loadUsers() {
@@ -122,15 +183,30 @@ public class AdminUsersController {
         lblCount.setText(userData.size() + " pengguna");
     }
 
-    @FXML private void handleRefresh()   { loadUsers(); }
-    @FXML private void handleDashboard() { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_DASHBOARD); }
-    @FXML private void handleProducts()  { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_PRODUCTS); }
-    @FXML private void handleOrders()    { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_ORDERS); }
+    @FXML private void handleRefresh()      { loadUsers(); }
+    @FXML private void handleDashboard()    { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_DASHBOARD); }
+    @FXML private void handleProducts()     { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_PRODUCTS); }
+    @FXML private void handleOrders()       { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_ORDERS); }
     @FXML private void handleRefreshUsers() { loadUsers(); }
+    @FXML private void handleSellerProfile(){ SceneManager.getInstance().switchTo(SceneManager.SceneName.SELLER_PROFILE); }
 
     @FXML
     private void handleLogout() {
         SessionManager.getInstance().logout();
         SceneManager.getInstance().switchTo(SceneManager.SceneName.LOGIN);
+    }
+
+    // ── Helper dialogs ───────────────────────────────────────────────────────
+
+    private void showInfo(String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK);
+        a.setHeaderText(null);
+        a.showAndWait();
+    }
+
+    private void showError(String msg) {
+        Alert a = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
+        a.setHeaderText(null);
+        a.showAndWait();
     }
 }

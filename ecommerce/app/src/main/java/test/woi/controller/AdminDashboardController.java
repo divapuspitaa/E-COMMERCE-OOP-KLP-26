@@ -1,21 +1,25 @@
 package test.woi.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import test.woi.dao.UserDAO;
 import test.woi.model.Order;
 import test.woi.service.OrderService;
 import test.woi.service.ProductService;
 import test.woi.util.SceneManager;
 import test.woi.util.SessionManager;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
-import java.util.List;
-import java.util.Locale;
 
 public class AdminDashboardController {
 
@@ -85,6 +89,8 @@ public class AdminDashboardController {
     @FXML private void handleProducts() { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_PRODUCTS); }
     @FXML private void handleOrders()   { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_ORDERS); }
     @FXML private void handleUsers()    { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_USERS); }
+
+    @FXML private void handleSellerProfile() { SceneManager.getInstance().switchTo(SceneManager.SceneName.SELLER_PROFILE); }
 
     @FXML
     private void handleLogout() {

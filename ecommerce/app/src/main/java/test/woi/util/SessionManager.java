@@ -1,11 +1,11 @@
 package test.woi.util;
 
-import test.woi.model.CartItem;
-import test.woi.model.User;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import test.woi.model.CartItem;
+import test.woi.model.User;
 
 /**
  * SessionManager - Singleton untuk menyimpan state sesi pengguna.
@@ -45,6 +45,7 @@ public class SessionManager {
 
     public boolean isLoggedIn() { return currentUser != null; }
     public User getCurrentUser() { return currentUser; }
+    public void setCurrentUser(User user) { this.currentUser = user; }
 
     public boolean isAdmin() { return isLoggedIn() && currentUser.isAdmin(); }
     public boolean isSeller() { return isLoggedIn() && currentUser.isSeller(); }

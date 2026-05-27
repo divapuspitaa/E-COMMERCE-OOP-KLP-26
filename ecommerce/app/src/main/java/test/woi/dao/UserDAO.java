@@ -1,12 +1,16 @@
 package test.woi.dao;
 
-import test.woi.model.User;
-import test.woi.util.DatabaseManager;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import test.woi.model.User;
+import test.woi.util.DatabaseManager;
 
 /**
  * UserDAO - Data Access Object untuk entitas User.
@@ -139,6 +143,17 @@ public class UserDAO {
             System.err.println("[UserDAO] findAll error: " + e.getMessage());
         }
         return users;
+    }
+
+    public boolean deleteById(String id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setString(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[UserDAO] deleteById error: " + e.getMessage());
+            return false;
+        }
     }
 
     public int countAll() {
