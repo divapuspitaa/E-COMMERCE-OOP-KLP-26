@@ -56,7 +56,8 @@
                 <!-- Demo Accounts Info -->
                 <VBox alignment="CENTER" spacing="4">
                     <Label text="── Akun Demo ──" styleClass="divider-text"/>
-                    <Label text="Penjual: seller1 / sell123" style="-fx-font-size:11px;-fx-text-fill:#ADB5BD;"/>
+                    <Label text="Admin:   admin / admin123" style="-fx-font-size:11px;-fx-text-fill:#ADB5BD;"/>
+                    <Label text="Penjual: seller1 / seller123" style="-fx-font-size:11px;-fx-text-fill:#ADB5BD;"/>
                     <Label text="Pembeli: customer1 / cust123" style="-fx-font-size:11px;-fx-text-fill:#ADB5BD;"/>
                 </VBox>
 
