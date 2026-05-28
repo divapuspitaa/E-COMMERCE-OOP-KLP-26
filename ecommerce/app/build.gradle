@@ -1,34 +1,26 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.14'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
-group   = 'test.woi'
-version = '21.0.0'
-
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
 }
 
 application {
-    mainModule = 'test.woi'
     mainClass  = 'test.woi.App'
 }
 
-run {
-    workingDir = projectDir
-    jvmArgs = [
-        '--enable-native-access=javafx.graphics',
-        '--enable-native-access=org.xerial.sqlitejdbc',
-        '-Dprism.forceGPU=true'
-    ]
-}
-
 javafx {
-    version = '21.0.3'
-    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.base']
+    version = "21.0.2"
+    modules = [
+        'javafx.controls', 
+        'javafx.fxml', 
+        'javafx.graphics', 
+        'javafx.base'
+    ]
 }
 
 repositories {
@@ -36,8 +28,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
+    implementation 'org.xerial:sqlite-jdbc:3.45.0.0'
 }
 
-compileJava.options.encoding    = 'UTF-8'
-compileTestJava.options.encoding = 'UTF-8'
+tasks.withType(ProcessResources) {
+    duplicatesStrategy = 'include'
+}

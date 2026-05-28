@@ -198,7 +198,7 @@ public class AdminProductsController {
 
     private void showEditDialog(Product p) { showProductDialog(p); }
 
-    @FXML private void handleDashboard() { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_DASHBOARD); }
+    @FXML private void handleDashboard() { SceneManager.getInstance().switchTo(SceneManager.SceneName.SELLER_DASHBOARD); }
     @FXML private void handleOrders()    { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_ORDERS); }
     @FXML private void handleUsers()     { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_USERS); }
     @FXML private void handleRefreshProducts() { loadProducts(); } // refresh halaman produk

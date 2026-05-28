@@ -13,27 +13,22 @@ import test.woi.util.SessionManager;
 
 /**
  * SellerProfileController - Mengelola halaman ubah profil khusus penjual.
- * Fitur: ubah nama lengkap, ubah username, ubah password.
+ * Memungkinkan penjual mengubah username dan password akun mereka.
  */
-
 public class SellerProfileController {
+
     @FXML private Label lblSellerName;
     @FXML private Label lblCurrentUsername;
 
-    // Nama Lengkap fields
-    @FXML private Label     lblCurrentFullName;
-    @FXML private TextField txtNewFullName;
-    @FXML private Label     lblFullNameMsg;
-
     // Username fields
     @FXML private TextField txtNewUsername;
-    @FXML private Label     lblUsernameMsg;
+    @FXML private Label lblUsernameMsg;
 
     // Password fields
     @FXML private PasswordField txtCurrentPassword;
     @FXML private PasswordField txtNewPassword;
     @FXML private PasswordField txtConfirmPassword;
-    @FXML private Label         lblPasswordMsg;
+    @FXML private Label lblPasswordMsg;
 
     private final UserDAO userDAO = new UserDAO();
     private User currentUser;
@@ -41,49 +36,8 @@ public class SellerProfileController {
     @FXML
     public void initialize() {
         currentUser = SessionManager.getInstance().getCurrentUser();
-        refreshDisplay();
-    }
-
-    private void refreshDisplay() {
         lblSellerName.setText(currentUser.getDisplayName());
         lblCurrentUsername.setText("@" + currentUser.getUsername());
-        lblCurrentFullName.setText(
-            currentUser.getFullName() != null && !currentUser.getFullName().isBlank()
-                ? currentUser.getFullName()
-                : "(belum diisi)"
-        );
-    }
-
-    // ── Simpan Nama Lengkap ──────────────────────────────────────────────────
-
-    @FXML
-    private void handleSaveFullName() {
-        String newName = txtNewFullName.getText().trim();
-
-        if (newName.isEmpty()) {
-            showMsg(lblFullNameMsg, "⚠️ Nama lengkap tidak boleh kosong.", "warn");
-            return;
-        }
-        if (newName.length() < 2) {
-            showMsg(lblFullNameMsg, "⚠️ Nama lengkap minimal 2 karakter.", "warn");
-            return;
-        }
-        if (newName.equals(currentUser.getFullName())) {
-            showMsg(lblFullNameMsg, "⚠️ Nama baru sama dengan nama saat ini.", "warn");
-            return;
-        }
-
-        currentUser.setFullName(newName);
-        boolean success = userDAO.update(currentUser);
-        if (success) {
-            // Perbarui sesi agar sidebar langsung update
-            SessionManager.getInstance().setCurrentUser(currentUser);
-            txtNewFullName.clear();
-            refreshDisplay();
-            showMsg(lblFullNameMsg, "✅ Nama lengkap berhasil diubah.", "success");
-        } else {
-            showMsg(lblFullNameMsg, "❌ Gagal menyimpan nama. Coba lagi.", "error");
-        }
     }
 
     // ── Simpan Username ──────────────────────────────────────────────────────
@@ -92,6 +46,7 @@ public class SellerProfileController {
     private void handleSaveUsername() {
         String newUsername = txtNewUsername.getText().trim();
 
+        // Validasi input
         if (newUsername.isEmpty()) {
             showMsg(lblUsernameMsg, "⚠️ Username baru tidak boleh kosong.", "warn");
             return;
@@ -108,11 +63,14 @@ public class SellerProfileController {
             showMsg(lblUsernameMsg, "⚠️ Username hanya boleh huruf, angka, titik, atau underscore.", "warn");
             return;
         }
+
+        // Cek apakah username sudah dipakai user lain
         if (userDAO.usernameExists(newUsername)) {
             showMsg(lblUsernameMsg, "❌ Username sudah digunakan oleh akun lain.", "error");
             return;
         }
 
+        // Konfirmasi
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "Ubah username menjadi \"" + newUsername + "\"?\nAnda akan diminta login ulang.",
                 ButtonType.OK, ButtonType.CANCEL);
@@ -124,9 +82,13 @@ public class SellerProfileController {
                 currentUser.setUsername(newUsername);
                 boolean success = userDAO.updateUsernameAndPassword(currentUser);
                 if (success) {
+                    showMsg(lblUsernameMsg, "✅ Username berhasil diubah. Silakan login ulang.", "success");
+                    txtNewUsername.clear();
+                    // Logout dan kembali ke halaman login
                     SessionManager.getInstance().logout();
                     SceneManager.getInstance().switchTo(SceneManager.SceneName.LOGIN);
                 } else {
+                    // Rollback jika gagal
                     currentUser.setUsername(oldUsername);
                     showMsg(lblUsernameMsg, "❌ Gagal menyimpan username. Coba lagi.", "error");
                 }
@@ -138,18 +100,22 @@ public class SellerProfileController {
 
     @FXML
     private void handleSavePassword() {
-        String currentPw = txtCurrentPassword.getText();
-        String newPw     = txtNewPassword.getText();
-        String confirmPw = txtConfirmPassword.getText();
+        String currentPw  = txtCurrentPassword.getText();
+        String newPw      = txtNewPassword.getText();
+        String confirmPw  = txtConfirmPassword.getText();
 
+        // Validasi input
         if (currentPw.isEmpty() || newPw.isEmpty() || confirmPw.isEmpty()) {
             showMsg(lblPasswordMsg, "⚠️ Semua field password harus diisi.", "warn");
             return;
         }
+
+        // Cek password saat ini
         if (!currentPw.equals(currentUser.getPassword())) {
             showMsg(lblPasswordMsg, "❌ Password saat ini tidak sesuai.", "error");
             return;
         }
+
         if (newPw.equals(currentPw)) {
             showMsg(lblPasswordMsg, "⚠️ Password baru sama dengan password saat ini.", "warn");
             return;
@@ -163,6 +129,7 @@ public class SellerProfileController {
             return;
         }
 
+        // Konfirmasi
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "Ubah password akun Anda?\nAnda akan diminta login ulang.",
                 ButtonType.OK, ButtonType.CANCEL);
@@ -174,6 +141,10 @@ public class SellerProfileController {
                 currentUser.setPassword(newPw);
                 boolean success = userDAO.updateUsernameAndPassword(currentUser);
                 if (success) {
+                    txtCurrentPassword.clear();
+                    txtNewPassword.clear();
+                    txtConfirmPassword.clear();
+                    // Logout dan kembali ke halaman login
                     SessionManager.getInstance().logout();
                     SceneManager.getInstance().switchTo(SceneManager.SceneName.LOGIN);
                 } else {
@@ -184,9 +155,9 @@ public class SellerProfileController {
         });
     }
 
-    // ── Navigasi Sidebar ─────────────────────────────────────────────────────
+    // ── Navigasi Sidebar ────────────────────────────────────────────────────
 
-    @FXML private void handleDashboard()     { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_DASHBOARD); }
+    @FXML private void handleDashboard()     { SceneManager.getInstance().switchTo(SceneManager.SceneName.SELLER_DASHBOARD); }
     @FXML private void handleProducts()      { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_PRODUCTS); }
     @FXML private void handleOrders()        { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_ORDERS); }
     @FXML private void handleUsers()         { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_USERS); }
@@ -203,14 +174,14 @@ public class SellerProfileController {
         });
     }
 
-    // ── Helper ───────────────────────────────────────────────────────────────
+    // ── Helper ──────────────────────────────────────────────────────────────
 
     private void showMsg(Label label, String text, String type) {
         label.setText(text);
         label.setStyle(switch (type) {
             case "success" -> "-fx-text-fill:#155724;-fx-font-weight:bold;-fx-font-size:12px;";
             case "error"   -> "-fx-text-fill:#721C24;-fx-font-weight:bold;-fx-font-size:12px;";
-            default        -> "-fx-text-fill:#856404;-fx-font-size:12px;";
+            default        -> "-fx-text-fill:#856404;-fx-font-size:12px;";  // warn
         });
     }
 }

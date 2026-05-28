@@ -15,7 +15,6 @@
             </VBox>
             <VBox spacing="2" style="-fx-padding:10 0;">
                 <Button text="📊  Dashboard" styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleDashboard"/>
-                <Button text="📦  Produk"    styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleProducts"/>
                 <Button text="🧾  Pesanan"   styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleOrders"/>
                 <Button text="👥  Pengguna"  styleClass="sidebar-item, sidebar-item-active" maxWidth="Infinity" onAction="#handleRefreshUsers"/>
                 <Button text="⚙️  Profil Saya" styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleSellerProfile"/>
@@ -46,7 +45,7 @@
                     <TableColumn fx:id="colRole"     text="Role"            prefWidth="110"/>
                     <TableColumn fx:id="colBalance"  text="Saldo"           prefWidth="120"/>
                     <TableColumn fx:id="colActive"   text="Status"          prefWidth="90"/>
-                    <TableColumn fx:id="colActions"  text="Aksi"            prefWidth="200"/>
+                    <TableColumn fx:id="colActions"  text="Aksi"            prefWidth="120"/>
                 </columns>
                 <placeholder><Label text="Tidak ada pengguna." style="-fx-text-fill:#ADB5BD;"/></placeholder>
             </TableView>

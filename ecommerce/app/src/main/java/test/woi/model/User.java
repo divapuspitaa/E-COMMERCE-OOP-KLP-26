@@ -7,6 +7,7 @@ package test.woi.model;
 public class User extends BaseEntity {
 
     public enum Role {
+        ADMIN("Administrator"),
         SELLER("Penjual"),
         CUSTOMER("Pembeli");
 
@@ -24,12 +25,14 @@ public class User extends BaseEntity {
     private Role role;
     private boolean isActive;
     private double balance;
+    private int adminSeq; // urutan akun admin (0 untuk non-admin)
 
     public User() {
         super();
         this.role = Role.CUSTOMER;
         this.isActive = true;
         this.balance = 0.0;
+        this.adminSeq = 0;
     }
 
     public User(String id, String username, String password,
@@ -45,6 +48,7 @@ public class User extends BaseEntity {
         this.role = role;
         this.isActive = isActive;
         this.balance = balance;
+        this.adminSeq = 0;
     }
 
     @Override
@@ -59,9 +63,8 @@ public class User extends BaseEntity {
                 && email != null && email.contains("@");
     }
 
-    /** Seller sekarang punya akses panel pengelolaan (menggantikan ADMIN) */
-    public boolean isAdmin() { return role == Role.SELLER; }
-    public boolean isSeller() { return role == Role.SELLER; }
+    public boolean isAdmin()    { return role == Role.ADMIN; }
+    public boolean isSeller()   { return role == Role.SELLER; }
     public boolean isCustomer() { return role == Role.CUSTOMER; }
 
     public void addBalance(double amount) {
@@ -103,6 +106,9 @@ public class User extends BaseEntity {
 
     public double getBalance() { return balance; }
     public void setBalance(double balance) { this.balance = balance; }
+
+    public int getAdminSeq() { return adminSeq; }
+    public void setAdminSeq(int adminSeq) { this.adminSeq = adminSeq; }
 
     @Override
     public String toString() {

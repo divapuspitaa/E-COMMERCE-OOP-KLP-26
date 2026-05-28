@@ -124,7 +124,7 @@ public class AdminOrdersController {
     }
 
     @FXML private void handleRefresh()   { loadOrders(); }
-    @FXML private void handleDashboard() { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_DASHBOARD); }
+    @FXML private void handleDashboard() { SceneManager.getInstance().switchTo(SceneManager.SceneName.SELLER_DASHBOARD); }
     @FXML private void handleProducts()  { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_PRODUCTS); }
     @FXML private void handleUsers()     { SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_USERS); }
     @FXML private void handleRefreshOrders() { loadOrders(); }

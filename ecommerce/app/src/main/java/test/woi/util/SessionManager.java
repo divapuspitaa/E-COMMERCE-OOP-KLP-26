@@ -45,10 +45,10 @@ public class SessionManager {
 
     public boolean isLoggedIn() { return currentUser != null; }
     public User getCurrentUser() { return currentUser; }
-    public void setCurrentUser(User user) { this.currentUser = user; }
 
-    public boolean isAdmin() { return isLoggedIn() && currentUser.isAdmin(); }
-    public boolean isSeller() { return isLoggedIn() && currentUser.isSeller(); }
+    public boolean isAdmin()     { return isLoggedIn() && currentUser.isAdmin(); }
+    public boolean isRealAdmin() { return isLoggedIn() && currentUser.isAdmin(); }
+    public boolean isSeller()    { return isLoggedIn() && currentUser.isSeller(); }
 
     // ─── Cart Management ───────────────────────────────────────────
 

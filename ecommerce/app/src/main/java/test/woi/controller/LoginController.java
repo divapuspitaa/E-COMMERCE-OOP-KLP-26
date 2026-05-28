@@ -1,12 +1,15 @@
 package test.woi.controller;
 
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import test.woi.model.User;
 import test.woi.service.AuthService;
 import test.woi.util.SceneManager;
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 
 /**
  * LoginController - mengontrol halaman login.
@@ -22,14 +25,11 @@ public class LoginController {
 
     @FXML
     public void initialize() {
-        // Enter key di password field langsung login
         txtPassword.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) handleLogin();
         });
-        // Clear error on typing
         txtUsername.textProperty().addListener((obs, o, n) -> hideError());
         txtPassword.textProperty().addListener((obs, o, n) -> hideError());
-
         Platform.runLater(() -> txtUsername.requestFocus());
     }
 
@@ -45,8 +45,10 @@ public class LoginController {
 
         if (result.success()) {
             User user = result.user();
-            if (user.isSeller()) {
+            if (user.isAdmin()) {
                 SceneManager.getInstance().switchTo(SceneManager.SceneName.ADMIN_DASHBOARD);
+            } else if (user.isSeller()) {
+                SceneManager.getInstance().switchTo(SceneManager.SceneName.SELLER_DASHBOARD);
             } else {
                 SceneManager.getInstance().switchTo(SceneManager.SceneName.HOME);
             }

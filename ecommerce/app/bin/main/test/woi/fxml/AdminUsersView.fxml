@@ -15,9 +15,9 @@
             </VBox>
             <VBox spacing="2" style="-fx-padding:10 0;">
                 <Button text="📊  Dashboard" styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleDashboard"/>
-                <Button text="📦  Produk"    styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleProducts"/>
                 <Button text="🧾  Pesanan"   styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleOrders"/>
                 <Button text="👥  Pengguna"  styleClass="sidebar-item, sidebar-item-active" maxWidth="Infinity" onAction="#handleRefreshUsers"/>
+                <Button text="⚙️  Profil Saya" styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleSellerProfile"/>
             </VBox>
             <Region VBox.vgrow="ALWAYS"/>
             <VBox style="-fx-padding:10 0 20 0;">

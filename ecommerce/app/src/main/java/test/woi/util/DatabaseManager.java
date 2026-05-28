@@ -61,6 +61,7 @@ public class DatabaseManager {
                 role        TEXT NOT NULL DEFAULT 'CUSTOMER',
                 is_active   INTEGER NOT NULL DEFAULT 1,
                 balance     REAL NOT NULL DEFAULT 0,
+                admin_seq   INTEGER NOT NULL DEFAULT 0,
                 created_at  TEXT,
                 updated_at  TEXT
             )
@@ -136,6 +137,13 @@ public class DatabaseManager {
             for (String sql : ddl) {
                 stmt.execute(sql);
             }
+            // Migrasi: tambah kolom admin_seq jika belum ada (untuk DB lama)
+            try {
+                stmt.execute("ALTER TABLE users ADD COLUMN admin_seq INTEGER NOT NULL DEFAULT 0");
+                System.out.println("[DB] Migrasi: kolom admin_seq ditambahkan.");
+            } catch (SQLException ignored) {
+                // Kolom sudah ada, abaikan
+            }
         }
 
         seedDefaultData();
@@ -150,20 +158,20 @@ public class DatabaseManager {
             return;
         }
 
-        // Seed admin
-        String adminId = "admin-001";
-        String sellerId = "seller-001";
+        String adminId    = "admin-001";
+        String sellerId   = "seller-001";
         String customerId = "customer-001";
 
         String[] seeds = {
-            "INSERT OR IGNORE INTO users (id,username,password,full_name,email,phone,address,role,is_active,balance,created_at,updated_at) VALUES " +
-            "('" + adminId + "','admin','admin123','Administrator','admin@aethercart26.id','081234567890','Jakarta',  'ADMIN',1,0,datetime('now'),datetime('now'))",
+            // Admin pertama (admin_seq=1)
+            "INSERT OR IGNORE INTO users (id,username,password,full_name,email,phone,address,role,is_active,balance,admin_seq,created_at,updated_at) VALUES " +
+            "('" + adminId + "','admin','admin123','Administrator','admin@aethercart26.id','081234567890','Jakarta','ADMIN',1,0,1,datetime('now'),datetime('now'))",
 
-            "INSERT OR IGNORE INTO users (id,username,password,full_name,email,phone,address,role,is_active,balance,created_at,updated_at) VALUES " +
-            "('" + sellerId + "','seller1','seller123','Budi Santoso','budi@toko.id','081298765432','Bandung','SELLER',1,500000,datetime('now'),datetime('now'))",
+            "INSERT OR IGNORE INTO users (id,username,password,full_name,email,phone,address,role,is_active,balance,admin_seq,created_at,updated_at) VALUES " +
+            "('" + sellerId + "','seller1','seller123','Budi Santoso','budi@toko.id','081298765432','Bandung','SELLER',1,500000,0,datetime('now'),datetime('now'))",
 
-            "INSERT OR IGNORE INTO users (id,username,password,full_name,email,phone,address,role,is_active,balance,created_at,updated_at) VALUES " +
-            "('" + customerId + "','customer1','cust123','Siti Rahayu','siti@gmail.com','085611223344','Surabaya','CUSTOMER',1,2000000,datetime('now'),datetime('now'))",
+            "INSERT OR IGNORE INTO users (id,username,password,full_name,email,phone,address,role,is_active,balance,admin_seq,created_at,updated_at) VALUES " +
+            "('" + customerId + "','customer1','cust123','Siti Rahayu','siti@gmail.com','085611223344','Surabaya','CUSTOMER',1,2000000,0,datetime('now'),datetime('now'))",
 
             // Produk fisik
             "INSERT OR IGNORE INTO products (id,name,description,price,stock,category,seller_id,image_url,rating,total_reviews,is_active,product_type,weight,discount_pct,dimensions,created_at,updated_at) VALUES " +

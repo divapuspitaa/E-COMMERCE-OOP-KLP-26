@@ -62,8 +62,8 @@ public class UserDAO {
     public boolean save(User user) {
         String sql = """
             INSERT INTO users (id,username,password,full_name,email,phone,address,
-                               role,is_active,balance,created_at,updated_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?,datetime('now'),datetime('now'))
+                               role,is_active,balance,admin_seq,created_at,updated_at)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,datetime('now'),datetime('now'))
             """;
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, user.getId());
@@ -76,6 +76,7 @@ public class UserDAO {
             ps.setString(8, user.getRole().name());
             ps.setInt(9, user.isActive() ? 1 : 0);
             ps.setDouble(10, user.getBalance());
+            ps.setInt(11, user.getAdminSeq());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("[UserDAO] save error: " + e.getMessage());
@@ -121,12 +122,24 @@ public class UserDAO {
         }
     }
 
+    /** Hapus user dari database secara permanen */
+    public boolean delete(String userId) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setString(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[UserDAO] delete error: " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean usernameExists(String username) {
         try (PreparedStatement ps = getConn().prepareStatement(
                 "SELECT COUNT(*) FROM users WHERE username = ?")) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1) > 0; // BUG FIX: rs.next() wajib dipanggil sebelum rs.getInt()
+            if (rs.next()) return rs.getInt(1) > 0;
             return false;
         } catch (SQLException e) {
             System.err.println("[UserDAO] usernameExists error: " + e.getMessage());
@@ -145,36 +158,35 @@ public class UserDAO {
         return users;
     }
 
-    public boolean deleteById(String id) {
-        String sql = "DELETE FROM users WHERE id = ?";
-        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
-            ps.setString(1, id);
-            return ps.executeUpdate() > 0;
+    /** Ambil urutan admin berikutnya */
+    public int getNextAdminSeq() {
+        try (Statement stmt = getConn().createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT MAX(admin_seq) FROM users WHERE role='ADMIN'")) {
+            if (rs.next()) return rs.getInt(1) + 1;
         } catch (SQLException e) {
-            System.err.println("[UserDAO] deleteById error: " + e.getMessage());
-            return false;
+            System.err.println("[UserDAO] getNextAdminSeq error: " + e.getMessage());
         }
+        return 1;
     }
 
     public int countAll() {
         try (Statement s = getConn().createStatement();
              ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM users")) {
-            if (rs.next()) return rs.getInt(1); // BUG FIX: rs.next() wajib dipanggil
+            if (rs.next()) return rs.getInt(1);
             return 0;
         } catch (SQLException e) { return 0; }
     }
 
     private User mapRow(ResultSet rs) throws SQLException {
-        // Handle data lama yang masih punya role "ADMIN" → diperlakukan sebagai SELLER
         String roleStr = rs.getString("role");
         User.Role role;
         try {
             role = User.Role.valueOf(roleStr);
         } catch (IllegalArgumentException e) {
-            // "ADMIN" tidak lagi ada di enum — fallback ke SELLER
-            role = User.Role.SELLER;
+            role = User.Role.CUSTOMER;
         }
-        return new User(
+
+        User user = new User(
             rs.getString("id"),
             rs.getString("username"),
             rs.getString("password"),
@@ -186,5 +198,14 @@ public class UserDAO {
             rs.getInt("is_active") == 1,
             rs.getDouble("balance")
         );
+
+        // Baca admin_seq (default 0 jika kolom belum ada di data lama)
+        try {
+            user.setAdminSeq(rs.getInt("admin_seq"));
+        } catch (SQLException ignored) {
+            user.setAdminSeq(0);
+        }
+
+        return user;
     }
 }

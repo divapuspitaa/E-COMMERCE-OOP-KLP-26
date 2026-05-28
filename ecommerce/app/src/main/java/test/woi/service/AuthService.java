@@ -1,15 +1,17 @@
 package test.woi.service;
 
+import java.util.Optional;
+
 import test.woi.dao.UserDAO;
 import test.woi.model.User;
 import test.woi.util.SessionManager;
-
-import java.util.Optional;
 
 /**
  * AuthService - logika bisnis untuk autentikasi.
  */
 public class AuthService {
+
+    private static final String ADMIN_PASSWORD = "OOP26";
 
     private final UserDAO userDAO = new UserDAO();
     private final SessionManager session = SessionManager.getInstance();
@@ -32,9 +34,14 @@ public class AuthService {
         return new LoginResult(true, "Login berhasil! Selamat datang, " + user.getDisplayName(), user);
     }
 
+    /**
+     * Registrasi akun.
+     * @param adminSecretPassword  Hanya wajib diisi jika role=ADMIN; kosong/null untuk role lain.
+     */
     public RegisterResult register(String username, String password, String confirmPassword,
                                    String fullName, String email, String phone, String address,
-                                   User.Role role) {
+                                   User.Role role, String adminSecretPassword) {
+
         if (username == null || username.isBlank())
             return new RegisterResult(false, "Username tidak boleh kosong.");
         if (username.length() < 4)
@@ -48,8 +55,19 @@ public class AuthService {
         if (userDAO.usernameExists(username.trim()))
             return new RegisterResult(false, "Username sudah digunakan.");
 
-        // Hanya boleh SELLER atau CUSTOMER — paksa ke CUSTOMER jika null
-        User.Role assignedRole = (role == User.Role.SELLER) ? User.Role.SELLER : User.Role.CUSTOMER;
+        // Validasi password admin
+        if (role == User.Role.ADMIN) {
+            if (adminSecretPassword == null || !adminSecretPassword.equals(ADMIN_PASSWORD)) {
+                return new RegisterResult(false, "Password admin tidak valid. Akses ditolak.");
+            }
+        }
+
+        // Pastikan role valid
+        User.Role assignedRole = switch (role) {
+            case ADMIN   -> User.Role.ADMIN;
+            case SELLER  -> User.Role.SELLER;
+            default      -> User.Role.CUSTOMER;
+        };
 
         User newUser = new User();
         newUser.setUsername(username.trim());
@@ -62,9 +80,23 @@ public class AuthService {
         newUser.setActive(true);
         newUser.setBalance(0);
 
+        // Tentukan admin_seq jika role ADMIN
+        if (assignedRole == User.Role.ADMIN) {
+            newUser.setAdminSeq(userDAO.getNextAdminSeq());
+        } else {
+            newUser.setAdminSeq(0);
+        }
+
         boolean saved = userDAO.save(newUser);
         if (saved) return new RegisterResult(true, "Registrasi berhasil! Silakan login.");
         return new RegisterResult(false, "Registrasi gagal. Coba lagi.");
+    }
+
+    /** Overload tanpa adminSecretPassword untuk kompatibilitas (role non-admin) */
+    public RegisterResult register(String username, String password, String confirmPassword,
+                                   String fullName, String email, String phone, String address,
+                                   User.Role role) {
+        return register(username, password, confirmPassword, fullName, email, phone, address, role, null);
     }
 
     public void logout() {

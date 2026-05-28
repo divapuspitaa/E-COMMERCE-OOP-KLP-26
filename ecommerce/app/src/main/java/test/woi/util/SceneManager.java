@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 
 /**
  * SceneManager - mengelola navigasi antar scene dalam aplikasi.
- * Menyimpan referensi stage utama dan cache scene.
  */
 public class SceneManager {
 
@@ -28,7 +27,10 @@ public class SceneManager {
         ADMIN_PRODUCTS,
         ADMIN_ORDERS,
         ADMIN_USERS,
-        SELLER_PROFILE
+        ADMIN_PANEL,       // Dashboard khusus Admin (bukan Seller)
+        ADMIN_MANAGE_USERS,// Kelola akun khusus Admin
+        SELLER_PROFILE,
+        SELLER_DASHBOARD
     }
 
     private static SceneManager instance;
@@ -37,19 +39,22 @@ public class SceneManager {
 
     private SceneManager() {
         fxmlPaths = new HashMap<>();
-        fxmlPaths.put(SceneName.LOGIN,           "/test/woi/fxml/LoginView.fxml");
-        fxmlPaths.put(SceneName.REGISTER,        "/test/woi/fxml/RegisterView.fxml");
-        fxmlPaths.put(SceneName.HOME,            "/test/woi/fxml/HomeView.fxml");
-        fxmlPaths.put(SceneName.PRODUCT_DETAIL,  "/test/woi/fxml/ProductDetailView.fxml");
-        fxmlPaths.put(SceneName.CART,            "/test/woi/fxml/CartView.fxml");
-        fxmlPaths.put(SceneName.CHECKOUT,        "/test/woi/fxml/CheckoutView.fxml");
-        fxmlPaths.put(SceneName.ORDER_HISTORY,   "/test/woi/fxml/OrderHistoryView.fxml");
-        fxmlPaths.put(SceneName.PROFILE,         "/test/woi/fxml/ProfileView.fxml");
-        fxmlPaths.put(SceneName.ADMIN_DASHBOARD, "/test/woi/fxml/AdminDashboardView.fxml");
-        fxmlPaths.put(SceneName.ADMIN_PRODUCTS,  "/test/woi/fxml/AdminProductsView.fxml");
-        fxmlPaths.put(SceneName.ADMIN_ORDERS,    "/test/woi/fxml/AdminOrdersView.fxml");
-        fxmlPaths.put(SceneName.ADMIN_USERS,     "/test/woi/fxml/AdminUsersView.fxml");
-        fxmlPaths.put(SceneName.SELLER_PROFILE, "/test/woi/fxml/SellerProfileView.fxml");
+        fxmlPaths.put(SceneName.LOGIN,              "/test/woi/fxml/LoginView.fxml");
+        fxmlPaths.put(SceneName.REGISTER,           "/test/woi/fxml/RegisterView.fxml");
+        fxmlPaths.put(SceneName.HOME,               "/test/woi/fxml/HomeView.fxml");
+        fxmlPaths.put(SceneName.PRODUCT_DETAIL,     "/test/woi/fxml/ProductDetailView.fxml");
+        fxmlPaths.put(SceneName.CART,               "/test/woi/fxml/CartView.fxml");
+        fxmlPaths.put(SceneName.CHECKOUT,           "/test/woi/fxml/CheckoutView.fxml");
+        fxmlPaths.put(SceneName.ORDER_HISTORY,      "/test/woi/fxml/OrderHistoryView.fxml");
+        fxmlPaths.put(SceneName.PROFILE,            "/test/woi/fxml/ProfileView.fxml");
+        fxmlPaths.put(SceneName.ADMIN_DASHBOARD,    "/test/woi/fxml/AdminDashboardView.fxml");
+        fxmlPaths.put(SceneName.ADMIN_PRODUCTS,     "/test/woi/fxml/AdminProductsView.fxml");
+        fxmlPaths.put(SceneName.ADMIN_ORDERS,       "/test/woi/fxml/AdminOrdersView.fxml");
+        fxmlPaths.put(SceneName.ADMIN_USERS,        "/test/woi/fxml/AdminUsersView.fxml");
+        fxmlPaths.put(SceneName.ADMIN_PANEL,        "/test/woi/fxml/AdminPanelView.fxml");
+        fxmlPaths.put(SceneName.ADMIN_MANAGE_USERS, "/test/woi/fxml/AdminManageUsersView.fxml");
+        fxmlPaths.put(SceneName.SELLER_PROFILE,     "/test/woi/fxml/SellerProfileView.fxml");
+        fxmlPaths.put(SceneName.SELLER_DASHBOARD,    "/test/woi/fxml/SellerDashboardView.fxml");
     }
 
     public static synchronized SceneManager getInstance() {
@@ -57,10 +62,7 @@ public class SceneManager {
         return instance;
     }
 
-    public void setPrimaryStage(Stage stage) {
-        this.primaryStage = stage;
-    }
-
+    public void setPrimaryStage(Stage stage) { this.primaryStage = stage; }
     public Stage getPrimaryStage() { return primaryStage; }
 
     public void switchTo(SceneName sceneName) {
@@ -73,11 +75,8 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             Scene scene = new Scene(root);
-
-            // Load global stylesheet
             String css = getClass().getResource("/test/woi/css/style.css").toExternalForm();
             scene.getStylesheets().add(css);
-
             primaryStage.setScene(scene);
             primaryStage.show();
             System.out.println("[Scene] Pindah ke: " + sceneName);
