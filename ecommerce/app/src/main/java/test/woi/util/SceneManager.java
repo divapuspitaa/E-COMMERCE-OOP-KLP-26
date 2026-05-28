@@ -1,13 +1,13 @@
 package test.woi.util;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * SceneManager - mengelola navigasi antar scene dalam aplikasi.
@@ -68,21 +68,24 @@ public class SceneManager {
     public void switchTo(SceneName sceneName) {
         String fxmlPath = fxmlPaths.get(sceneName);
         if (fxmlPath == null) {
-            System.err.println("[Scene] FXML path tidak ditemukan untuk: " + sceneName);
-            return;
+            throw new RuntimeException("[Scene] FXML path tidak ditemukan untuk: " + sceneName);
         }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            if (getClass().getResource(fxmlPath) == null) {
+                throw new IOException("Resource FXML tidak ditemukan: " + fxmlPath);
+            }
             Parent root = loader.load();
             Scene scene = new Scene(root);
-            String css = getClass().getResource("/test/woi/css/style.css").toExternalForm();
-            scene.getStylesheets().add(css);
+            var cssUrl = getClass().getResource("/test/woi/css/style.css");
+            if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
             primaryStage.setScene(scene);
             primaryStage.show();
             System.out.println("[Scene] Pindah ke: " + sceneName);
         } catch (IOException e) {
             System.err.println("[Scene] Gagal memuat FXML " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Gagal memuat scene: " + sceneName + " -> " + e.getMessage(), e);
         }
     }
 
