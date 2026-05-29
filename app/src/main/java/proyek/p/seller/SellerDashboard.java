@@ -1,0 +1,358 @@
+package proyek.p.seller;
+
+import java.util.List;
+
+import javafx.animation.FadeTransition;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import proyek.p.App;
+import proyek.p.model.DataStore;
+import proyek.p.model.Product;
+import proyek.p.model.Seller;
+import proyek.p.ui.Theme;
+import proyek.p.ui.UIFactory;
+
+public class SellerDashboard {
+    private final Stage   stage;
+    private final Seller  seller;
+    private final DataStore store = DataStore.getInstance();
+
+    public SellerDashboard(Stage stage, Seller seller) {
+        this.stage  = stage;
+        this.seller = seller;
+    }
+
+    public void show() {
+        BorderPane root = new BorderPane();
+        root.setTop(UIFactory.navbar("Seller Dashboard", seller.getUsername(), "SELLER", App::showLogin));
+        root.setLeft(buildSidebar(root));
+        root.setCenter(wrapScroll(buildProductListPanel()));
+        root.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
+
+        Scene scene = new Scene(root, 1200, 760);
+        stage.setScene(scene);
+        stage.setTitle("ZALORA — Seller Dashboard");
+
+        root.setOpacity(0);
+        FadeTransition ft = new FadeTransition(Duration.millis(400), root);
+        ft.setToValue(1);
+        ft.play();
+    }
+
+    // ── Sidebar ──────────────────────────────────────────────────────────────────
+    private VBox buildSidebar(BorderPane root) {
+        VBox sidebar = new VBox();
+        sidebar.setPrefWidth(220);
+        sidebar.setStyle(
+            "-fx-background-color: " + Theme.WHITE + ";" +
+            "-fx-border-color: " + Theme.BORDER + "; -fx-border-width: 0 1 0 0;"
+        );
+        sidebar.setPadding(new Insets(24, 0, 24, 0));
+
+        ToggleGroup group = new ToggleGroup();
+
+        ToggleButton btnList = sidebarBtn("📦  Produk Saya", group, true);
+        ToggleButton btnAdd  = sidebarBtn("➕  Tambah Produk", group, false);
+
+        btnList.setOnAction(e -> root.setCenter(wrapScroll(buildProductListPanel())));
+        btnAdd.setOnAction(e  -> root.setCenter(wrapScroll(buildAddProductPanel(root))));
+
+        // Seller profile snippet
+        VBox profile = buildProfileSnippet();
+
+        sidebar.getChildren().addAll(btnList, btnAdd, new Region() {{ VBox.setVgrow(this, Priority.ALWAYS); }}, profile);
+        return sidebar;
+    }
+
+    private VBox buildProfileSnippet() {
+        Label nameLbl = new Label(seller.getUsername());
+        nameLbl.setStyle("-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        Label emailLbl = new Label(seller.getEmail());
+        emailLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        Label badge = UIFactory.badge("SELLER", Theme.ACCENT);
+
+        VBox box = new VBox(4, badge, nameLbl, emailLbl);
+        box.setPadding(new Insets(16, 20, 16, 20));
+        box.setStyle("-fx-background-color: rgba(0,194,168,0.05); -fx-background-radius: 0;");
+        return box;
+    }
+
+    private ToggleButton sidebarBtn(String text, ToggleGroup group, boolean selected) {
+        ToggleButton btn = new ToggleButton(text);
+        btn.setToggleGroup(group);
+        btn.setSelected(selected);
+        btn.setPrefWidth(220);
+        btn.setPrefHeight(48);
+        btn.setAlignment(Pos.CENTER_LEFT);
+        btn.setPadding(new Insets(0, 0, 0, 24));
+        String base = "-fx-background-color: transparent; -fx-font-size: 14; -fx-text-fill: " + Theme.TEXT_SECONDARY + "; -fx-cursor: hand; -fx-background-radius: 0;";
+        String sel  = "-fx-background-color: rgba(0,194,168,0.08); -fx-font-size: 14; -fx-text-fill: " + Theme.ACCENT + "; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 0; -fx-border-color: transparent transparent transparent " + Theme.ACCENT + "; -fx-border-width: 0 0 0 3;";
+        btn.setStyle(selected ? sel : base);
+        btn.selectedProperty().addListener((obs, o, nw) -> btn.setStyle(nw ? sel : base));
+        return btn;
+    }
+
+    private ScrollPane wrapScroll(javafx.scene.Node content) {
+        ScrollPane sp = new ScrollPane(content);
+        sp.setFitToWidth(true);
+        sp.setStyle("-fx-background-color: " + Theme.SURFACE + "; -fx-background: " + Theme.SURFACE + ";");
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        return sp;
+    }
+
+    // ── Product List Panel ───────────────────────────────────────────────────────
+    @SuppressWarnings("unchecked")
+    private VBox buildProductListPanel() {
+        VBox panel = new VBox(24);
+        panel.setPadding(new Insets(32));
+
+        List<Product> myProducts = store.getProductsBySeller(seller.getId());
+
+        Label title    = UIFactory.heading("Produk Saya");
+        Label subtitle = UIFactory.bodyText("Kamu memiliki " + myProducts.size() + " produk terdaftar.");
+
+        // Stat row
+        double totalValue = myProducts.stream().mapToDouble(p -> p.getPrice() * p.getStock()).sum();
+        HBox stats = new HBox(16,
+            UIFactory.statCard(String.valueOf(myProducts.size()), "Total Produk", Theme.ACCENT),
+            UIFactory.statCard(String.format("Rp %,.0f", totalValue), "Nilai Inventori", Theme.SUCCESS)
+        );
+
+        // Table
+        TableView<Product> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setPrefHeight(380);
+        table.setStyle("-fx-font-size: 13;");
+
+        TableColumn<Product, String> colName = new TableColumn<>("Nama Produk");
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colName.setMinWidth(180);
+
+        TableColumn<Product, String> colCat = new TableColumn<>("Kategori");
+        colCat.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+        TableColumn<Product, Double> colPrice = new TableColumn<>("Harga");
+        colPrice.setMinWidth(130);
+        colPrice.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) { setText(null); return; }
+                setText(getTableRow().getItem().getFormattedPrice());
+            }
+        });
+
+        TableColumn<Product, Integer> colStock = new TableColumn<>("Stok");
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
+
+        TableColumn<Product, Void> colAction = new TableColumn<>("Aksi");
+        colAction.setMinWidth(200);
+        colAction.setCellFactory(col -> new TableCell<>() {
+            final Button editBtn   = UIFactory.outlineBtn("Edit");
+            final Button deleteBtn = UIFactory.dangerBtn("Hapus");
+            {
+                editBtn.setPadding(new Insets(6, 14, 6, 14));
+                deleteBtn.setPadding(new Insets(6, 14, 6, 14));
+            }
+            @Override protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) { setGraphic(null); return; }
+                Product p = getTableView().getItems().get(getIndex());
+                editBtn.setOnAction(e -> showEditDialog(p));
+                deleteBtn.setOnAction(e -> {
+                    if (UIFactory.showConfirm("Hapus Produk", "Hapus produk \"" + p.getName() + "\"?")) {
+                        store.deleteProduct(p.getId());
+                        show();
+                    }
+                });
+                HBox box = new HBox(8, editBtn, deleteBtn);
+                box.setAlignment(Pos.CENTER_LEFT);
+                setGraphic(box);
+            }
+        });
+
+        table.getColumns().addAll(colName, colCat, colPrice, colStock, colAction);
+        table.getItems().addAll(myProducts);
+
+        VBox tableCard = UIFactory.card(table);
+        panel.getChildren().addAll(title, subtitle, stats, tableCard);
+        return panel;
+    }
+
+    // ── Add Product Panel ────────────────────────────────────────────────────────
+    private VBox buildAddProductPanel(BorderPane root) {
+        VBox panel = new VBox(24);
+        panel.setPadding(new Insets(32));
+
+        Label title    = UIFactory.heading("Tambah Produk Baru");
+        Label subtitle = UIFactory.bodyText("Isi detail produk yang ingin Anda jual.");
+
+        TextField nameField  = UIFactory.inputField("Nama produk");
+        nameField.setPrefWidth(480);
+        TextArea descArea    = UIFactory.textArea("Deskripsi produk...", 4);
+        descArea.setPrefWidth(480);
+        TextField priceField = UIFactory.inputField("Contoh: 299000");
+        priceField.setPrefWidth(480);
+        TextField stockField = UIFactory.inputField("Contoh: 50");
+        stockField.setPrefWidth(480);
+
+        ComboBox<String> catBox = new ComboBox<>();
+        catBox.getItems().addAll("Sepatu", "Pakaian", "Aksesoris", "Tas", "Olahraga", "Lainnya");
+        catBox.setPromptText("Pilih kategori");
+        catBox.setStyle(Theme.INPUT_STYLE);
+        catBox.setPrefWidth(480);
+
+        Label errorLbl = new Label();
+        errorLbl.setStyle("-fx-text-fill: " + Theme.DANGER + "; -fx-font-size: 13;");
+        errorLbl.setVisible(false);
+
+        Button submitBtn = UIFactory.accentBtn("Simpan Produk");
+        submitBtn.setPrefWidth(480);
+        submitBtn.setPrefHeight(48);
+
+        submitBtn.setOnAction(e -> {
+            errorLbl.setVisible(false);
+            String name = nameField.getText().trim();
+            String desc = descArea.getText().trim();
+            String cat  = catBox.getValue();
+            if (name.isEmpty() || desc.isEmpty() || cat == null) {
+                showFieldError(errorLbl, "Nama, deskripsi, dan kategori wajib diisi."); return;
+            }
+            double price;
+            int    stock;
+            try { price = Double.parseDouble(priceField.getText().trim()); }
+            catch (NumberFormatException ex) { showFieldError(errorLbl, "Format harga tidak valid."); return; }
+            try { stock = Integer.parseInt(stockField.getText().trim()); }
+            catch (NumberFormatException ex) { showFieldError(errorLbl, "Format stok tidak valid."); return; }
+
+            Product p = new Product(
+                store.generateId(), name, desc, price, stock, cat,
+                seller.getId(), seller.getUsername()
+            );
+            store.addProduct(p);
+            UIFactory.showAlert("Berhasil!", "Produk berhasil ditambahkan.", Alert.AlertType.INFORMATION);
+            show();
+        });
+
+        VBox form = UIFactory.card(
+            UIFactory.subheading("Detail Produk"),
+            UIFactory.divider(),
+            UIFactory.formField("Nama Produk *", nameField),
+            UIFactory.formField("Deskripsi *", descArea),
+            UIFactory.formField("Harga (Rp) *", priceField),
+            UIFactory.formField("Stok *", stockField),
+            UIFactory.formField("Kategori *", catBox),
+            errorLbl,
+            submitBtn
+        );
+        form.setMaxWidth(540);
+
+        panel.getChildren().addAll(title, subtitle, form);
+        return panel;
+    }
+
+    // ── Edit Product Dialog ──────────────────────────────────────────────────────
+    private void showEditDialog(Product product) {
+        Stage dialog = new Stage();
+        dialog.setTitle("Edit Produk");
+        dialog.initOwner(stage);
+
+        TextField nameField  = UIFactory.inputField("Nama produk");
+        nameField.setText(product.getName());
+        nameField.setPrefWidth(400);
+
+        TextArea descArea = UIFactory.textArea("Deskripsi", 3);
+        descArea.setText(product.getDescription());
+        descArea.setPrefWidth(400);
+
+        TextField priceField = UIFactory.inputField("Harga");
+        priceField.setText(String.valueOf((int) product.getPrice()));
+        priceField.setPrefWidth(400);
+
+        TextField stockField = UIFactory.inputField("Stok");
+        stockField.setText(String.valueOf(product.getStock()));
+        stockField.setPrefWidth(400);
+
+        ComboBox<String> catBox = new ComboBox<>();
+        catBox.getItems().addAll("Sepatu", "Pakaian", "Aksesoris", "Tas", "Olahraga", "Lainnya");
+        catBox.setValue(product.getCategory());
+        catBox.setStyle(Theme.INPUT_STYLE);
+        catBox.setPrefWidth(400);
+
+        Button saveBtn   = UIFactory.accentBtn("Simpan Perubahan");
+        Button cancelBtn = UIFactory.outlineBtn("Batal");
+        saveBtn.setPrefWidth(190);
+        cancelBtn.setPrefWidth(190);
+
+        Label errorLbl = new Label();
+        errorLbl.setStyle("-fx-text-fill: " + Theme.DANGER + "; -fx-font-size: 13;");
+
+        saveBtn.setOnAction(e -> {
+            String name = nameField.getText().trim();
+            String desc = descArea.getText().trim();
+            String cat  = catBox.getValue();
+            if (name.isEmpty() || desc.isEmpty() || cat == null) {
+                errorLbl.setText("Semua field wajib diisi."); return;
+            }
+            double price;
+            int    stock;
+            try { price = Double.parseDouble(priceField.getText().trim()); }
+            catch (NumberFormatException ex) { errorLbl.setText("Format harga tidak valid."); return; }
+            try { stock = Integer.parseInt(stockField.getText().trim()); }
+            catch (NumberFormatException ex) { errorLbl.setText("Format stok tidak valid."); return; }
+
+            product.setName(name);
+            product.setDescription(desc);
+            product.setPrice(price);
+            product.setStock(stock);
+            product.setCategory(cat);
+            dialog.close();
+            UIFactory.showAlert("Berhasil!", "Produk berhasil diperbarui.", Alert.AlertType.INFORMATION);
+            show();
+        });
+        cancelBtn.setOnAction(e -> dialog.close());
+
+        HBox btnRow = new HBox(12, saveBtn, cancelBtn);
+
+        VBox content = new VBox(14,
+            UIFactory.subheading("Edit: " + product.getName()),
+            UIFactory.divider(),
+            UIFactory.formField("Nama Produk", nameField),
+            UIFactory.formField("Deskripsi", descArea),
+            UIFactory.formField("Harga (Rp)", priceField),
+            UIFactory.formField("Stok", stockField),
+            UIFactory.formField("Kategori", catBox),
+            errorLbl, btnRow
+        );
+        content.setPadding(new Insets(28));
+        content.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
+
+        dialog.setScene(new Scene(content, 460, 580));
+        dialog.showAndWait();
+    }
+
+    private void showFieldError(Label lbl, String msg) {
+        lbl.setText(msg);
+        lbl.setVisible(true);
+    }
+}
