@@ -129,6 +129,7 @@ public class AdminDashboard {
 
     // ── Overview Panel ───────────────────────────────────────────────────────────
     private VBox buildOverviewPanel() {
+        int adminCount    = store.getAdmins().size();
         int sellerCount   = store.getSellers().size();
         int customerCount = store.getCustomers().size();
         int productCount  = store.getAllProducts().size();
@@ -142,6 +143,7 @@ public class AdminDashboard {
 
         HBox stats = new HBox(16,
             UIFactory.statCard(String.valueOf(totalUsers),    "Total Pengguna",  Theme.ACCENT),
+            UIFactory.statCard(String.valueOf(adminCount),    "Total Admin",     "#E11D48"),
             UIFactory.statCard(String.valueOf(sellerCount),   "Total Seller",    Theme.TEXT_PRIMARY),
             UIFactory.statCard(String.valueOf(customerCount), "Total Customer",  "#6366F1"),
             UIFactory.statCard(String.valueOf(productCount),  "Total Produk",    Theme.WARNING)
@@ -508,16 +510,16 @@ public class AdminDashboard {
 
         // Info card
         VBox infoCard = UIFactory.card(
-            activityDetail("👤", "Username", admin.getUsername()),
-            activityDetail("🔑", "Role", "ADMIN"),
-            activityDetail("🆔", "ID Admin", "#" + admin.getId())
+            profileItem("👤", "Username", admin.getUsername()),
+            profileItem("🔑", "Role", "ADMIN"),
+            profileItem("🆔", "ID Admin", "#" + admin.getId())
         );
 
         panel.getChildren().addAll(title, subtitle, infoCard, usernameCard, passCard);
         return panel;
     }
 
-    private HBox activityDetail(String icon, String label, String value) {
+    private HBox profileItem(String icon, String label, String value) {
         Label iconLbl = new Label(icon);
         iconLbl.setStyle("-fx-font-size: 16;");
         Label labelLbl = new Label(label + ":");

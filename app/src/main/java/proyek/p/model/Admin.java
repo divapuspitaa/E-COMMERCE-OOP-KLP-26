@@ -8,3 +8,4 @@ public class Admin extends User {
     @Override
     public String getDashboardTitle() { return "Admin Dashboard"; }
 }
+
