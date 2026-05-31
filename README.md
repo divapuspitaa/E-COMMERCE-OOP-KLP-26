@@ -1,8 +1,8 @@
-# ZALORA — E-Commerce Platform Management System
+# DIVERYU — E-Commerce Platform Management System
 
 ## Deskripsi
 Aplikasi JavaFX dengan tiga role: **Admin**, **Seller**, dan **Customer**.  
-Tampilan modern bergaya Zalora dengan palet hitam & teal.
+Tampilan modern bergaya DIVERYU dengan palet hitam & teal.
 
 ---
 
