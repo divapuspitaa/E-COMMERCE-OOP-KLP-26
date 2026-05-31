@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="test.woi.controller.SellerProfileController"
+            minWidth="1050" minHeight="680">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar" spacing="0">
+            <VBox styleClass="sidebar-header" spacing="4" alignment="CENTER_LEFT">
+                <Label text="🛍 AetherCart 26" style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+                <Label text="Panel Penjual" style="-fx-font-size:11px;-fx-text-fill:rgba(255,255,255,0.7);"/>
+            </VBox>
+
+            <!-- Seller Info -->
+            <VBox alignment="CENTER" spacing="6" style="-fx-padding:20 16;-fx-border-color:rgba(255,255,255,0.08);-fx-border-width:0 0 1 0;">
+                <Label text="🏪" style="-fx-font-size:36px;"/>
+                <Label fx:id="lblSellerName" text="Penjual" style="-fx-text-fill:white;-fx-font-weight:bold;-fx-font-size:13px;"/>
+                <Label text="Penjual" style="-fx-text-fill:rgba(255,255,255,0.5);-fx-font-size:10px;"/>
+            </VBox>
+
+            <!-- Navigation -->
+            <VBox spacing="2" style="-fx-padding:10 0;">
+                <Button text="📊  Dashboard"   styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleDashboard"/>
+                <Button text="📦  Produk"       styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleProducts"/>
+                <Button text="🧾  Pesanan"      styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleOrders"/>
+                <Button text="⚙️  Profil Saya"  styleClass="sidebar-item, sidebar-item-active" maxWidth="Infinity" onAction="#handleSellerProfile"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Logout -->
+            <VBox style="-fx-padding:10 0 20 0;">
+                <Button text="🚪  Keluar" styleClass="sidebar-item" maxWidth="Infinity"
+                        style="-fx-text-fill:#E74C3C;" onAction="#handleLogout"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN CONTENT -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox spacing="24" style="-fx-padding:36 40;">
+
+                <!-- Header -->
+                <VBox spacing="4">
+                    <Label text="⚙️ Profil Saya" style="-fx-font-size:24px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                    <Label text="Ubah username dan password akun penjual Anda" style="-fx-font-size:13px;-fx-text-fill:#6C757D;"/>
+                </VBox>
+
+                <!-- Info Card -->
+                <HBox styleClass="card" spacing="16" alignment="CENTER_LEFT"
+                      style="-fx-background-color:#FFF3CD;-fx-border-color:#F39C12;-fx-border-width:0 0 0 4;-fx-border-radius:0 8 8 0;-fx-background-radius:0 8 8 0;">
+                    <Label text="ℹ️" style="-fx-font-size:18px;"/>
+                    <VBox spacing="2">
+                        <Label text="Perhatian" style="-fx-font-weight:bold;-fx-text-fill:#856404;-fx-font-size:13px;"/>
+                        <Label text="Setelah mengubah username atau password, Anda akan diminta login ulang."
+                               style="-fx-text-fill:#856404;-fx-font-size:12px;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Form Card -->
+                <VBox styleClass="card" spacing="20" maxWidth="560">
+
+                    <!-- Ubah Username -->
+                    <VBox spacing="14">
+                        <Label text="🔤 Ubah Username" style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        <Separator/>
+
+                        <VBox spacing="6">
+                            <Label text="Username Saat Ini" style="-fx-font-size:12px;-fx-text-fill:#6C757D;-fx-font-weight:bold;"/>
+                            <Label fx:id="lblCurrentUsername"
+                                   style="-fx-font-size:14px;-fx-text-fill:#1A1A2E;-fx-font-weight:bold;
+                                          -fx-background-color:#F8F9FA;-fx-padding:8 12;
+                                          -fx-background-radius:8;-fx-border-color:#DEE2E6;
+                                          -fx-border-radius:8;-fx-border-width:1;"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Username Baru" style="-fx-font-size:12px;-fx-text-fill:#6C757D;-fx-font-weight:bold;"/>
+                            <TextField fx:id="txtNewUsername" promptText="Masukkan username baru..."
+                                       style="-fx-font-size:13px;-fx-pref-height:38;"/>
+                        </VBox>
+
+                        <Label fx:id="lblUsernameMsg" text="" style="-fx-font-size:12px;"/>
+
+                        <Button text="💾  Simpan Username" styleClass="btn-primary"
+                                onAction="#handleSaveUsername" style="-fx-pref-width:200;"/>
+                    </VBox>
+
+                    <Separator/>
+
+                    <!-- Ubah Password -->
+                    <VBox spacing="14">
+                        <Label text="🔒 Ubah Password" style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        <Separator/>
+
+                        <VBox spacing="6">
+                            <Label text="Password Saat Ini" style="-fx-font-size:12px;-fx-text-fill:#6C757D;-fx-font-weight:bold;"/>
+                            <PasswordField fx:id="txtCurrentPassword" promptText="Masukkan password saat ini..."
+                                           style="-fx-font-size:13px;-fx-pref-height:38;"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Password Baru" style="-fx-font-size:12px;-fx-text-fill:#6C757D;-fx-font-weight:bold;"/>
+                            <PasswordField fx:id="txtNewPassword" promptText="Masukkan password baru..."
+                                           style="-fx-font-size:13px;-fx-pref-height:38;"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Konfirmasi Password Baru" style="-fx-font-size:12px;-fx-text-fill:#6C757D;-fx-font-weight:bold;"/>
+                            <PasswordField fx:id="txtConfirmPassword" promptText="Ulangi password baru..."
+                                           style="-fx-font-size:13px;-fx-pref-height:38;"/>
+                        </VBox>
+
+                        <Label fx:id="lblPasswordMsg" text="" style="-fx-font-size:12px;"/>
+
+                        <Button text="🔑  Simpan Password" styleClass="btn-secondary"
+                                onAction="#handleSavePassword" style="-fx-pref-width:200;"/>
+                    </VBox>
+
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

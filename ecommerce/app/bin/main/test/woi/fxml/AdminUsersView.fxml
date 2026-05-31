@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="test.woi.controller.AdminUsersController"
+            minWidth="1050" minHeight="680">
+
+    <left>
+        <VBox styleClass="sidebar" spacing="0">
+            <VBox styleClass="sidebar-header" spacing="4">
+                <Label text="🛍 AetherCart 26" style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+                <Label text="Panel Penjual" style="-fx-font-size:11px;-fx-text-fill:rgba(255,255,255,0.7);"/>
+            </VBox>
+            <VBox spacing="2" style="-fx-padding:10 0;">
+                <Button text="📊  Dashboard" styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleDashboard"/>
+                <Button text="🧾  Pesanan"   styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleOrders"/>
+                <Button text="👥  Pengguna"  styleClass="sidebar-item, sidebar-item-active" maxWidth="Infinity" onAction="#handleRefreshUsers"/>
+                <Button text="⚙️  Profil Saya" styleClass="sidebar-item" maxWidth="Infinity" onAction="#handleSellerProfile"/>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <VBox style="-fx-padding:10 0 20 0;">
+                <Button text="🚪  Keluar" styleClass="sidebar-item" maxWidth="Infinity"
+                        style="-fx-text-fill:#E74C3C;" onAction="#handleLogout"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20" style="-fx-padding:28;">
+            <HBox alignment="CENTER_LEFT" spacing="14">
+                <Label text="👥 Kelola Pengguna" style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cmbRole" promptText="Filter Role" onAction="#handleFilter"
+                          style="-fx-font-size:12px;-fx-pref-width:150;"/>
+                <Button text="🔄 Refresh" styleClass="btn-outline" onAction="#handleRefresh"/>
+            </HBox>
+
+            <TableView fx:id="tableUsers" VBox.vgrow="ALWAYS" style="-fx-background-radius:12;">
+                <columns>
+                    <TableColumn fx:id="colName"     text="Nama Lengkap"   prefWidth="180"/>
+                    <TableColumn fx:id="colUsername" text="Username"        prefWidth="130"/>
+                    <TableColumn fx:id="colEmail"    text="Email"           prefWidth="180"/>
+                    <TableColumn fx:id="colRole"     text="Role"            prefWidth="110"/>
+                    <TableColumn fx:id="colBalance"  text="Saldo"           prefWidth="120"/>
+                    <TableColumn fx:id="colActive"   text="Status"          prefWidth="90"/>
+                    <TableColumn fx:id="colActions"  text="Aksi"            prefWidth="120"/>
+                </columns>
+                <placeholder><Label text="Tidak ada pengguna." style="-fx-text-fill:#ADB5BD;"/></placeholder>
+            </TableView>
+
+            <Label fx:id="lblCount" text="0 pengguna" style="-fx-font-size:12px;-fx-text-fill:#6C757D;"/>
+        </VBox>
+    </center>
+</BorderPane>

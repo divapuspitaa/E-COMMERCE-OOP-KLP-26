@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="test.woi.controller.ProfileController"
+            minWidth="900" minHeight="640">
+
+    <top>
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="16">
+            <Label text="🛍 AetherCart 26" styleClass="navbar-brand"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="🏠 Beranda" styleClass="navbar-btn" onAction="#handleHome"/>
+            <Button text="📦 Pesanan" styleClass="navbar-btn" onAction="#handleOrders"/>
+            <Button text="🛒 Keranjang" styleClass="navbar-btn" onAction="#handleCart"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <HBox spacing="24" style="-fx-padding:28;" alignment="TOP_CENTER">
+
+                <!-- ─── KIRI: Avatar & Stats ─────────────────────── -->
+                <VBox spacing="16" minWidth="260" maxWidth="280">
+
+                    <VBox styleClass="card" spacing="14" alignment="CENTER">
+                        <Label fx:id="lblAvatar" text="👤" style="-fx-font-size:64px;"/>
+                        <VBox alignment="CENTER" spacing="4">
+                            <Label fx:id="lblName" text="-"
+                                   style="-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                            <Label fx:id="lblRole" text="-"
+                                   style="-fx-font-size:12px;-fx-text-fill:#6C757D;"/>
+                            <Label fx:id="lblUsername" text="-"
+                                   style="-fx-font-size:12px;-fx-text-fill:#ADB5BD;"/>
+                        </VBox>
+                    </VBox>
+
+                    <VBox styleClass="stat-card, stat-card-green" spacing="6" alignment="CENTER">
+                        <Label text="💰 Saldo Anda" style="-fx-text-fill:white;-fx-font-size:12px;"/>
+                        <Label fx:id="lblBalance" text="Rp 0"
+                               style="-fx-text-fill:white;-fx-font-size:22px;-fx-font-weight:bold;"/>
+                        <Button text="+ Top Up Saldo" styleClass="btn-ghost"
+                                style="-fx-text-fill:white;-fx-border-color:white;-fx-border-radius:8;-fx-background-radius:8;-fx-border-width:1;"
+                                onAction="#handleTopUp"/>
+                    </VBox>
+
+                    <VBox styleClass="card" spacing="10">
+                        <Label text="Statistik Belanja"
+                               style="-fx-font-weight:bold;-fx-font-size:13px;-fx-text-fill:#1A1A2E;"/>
+                        <HBox>
+                            <Label text="Total Pesanan" style="-fx-text-fill:#6C757D;-fx-font-size:12px;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblOrderCount" text="0"
+                                   style="-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                        </HBox>
+                        <HBox>
+                            <Label text="Pesanan Selesai" style="-fx-text-fill:#6C757D;-fx-font-size:12px;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblDoneCount" text="0"
+                                   style="-fx-font-weight:bold;-fx-text-fill:#27AE60;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- ─── KANAN: Form ──────────────────────────────── -->
+                <VBox spacing="20" HBox.hgrow="ALWAYS" maxWidth="540">
+
+                    <!-- ════════════════════════════════════════
+                         SECTION PEMBELI — Edit Profil
+                         (disembunyikan untuk penjual)
+                    ════════════════════════════════════════ -->
+                    <VBox fx:id="sectionEditProfil" spacing="14">
+                        <Label text="✏️ Edit Profil"
+                               style="-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+
+                        <Label fx:id="lblMsg" text="" wrapText="true" maxWidth="500"
+                               style="-fx-font-size:12px;" visible="false" managed="false"/>
+
+                        <VBox styleClass="card" spacing="14">
+                            <GridPane hgap="14" vgap="14">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <Label text="Nama Lengkap" styleClass="form-label"/>
+                                    <TextField fx:id="txtFullName" styleClass="text-field" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <Label text="Email" styleClass="form-label"/>
+                                    <TextField fx:id="txtEmail" styleClass="text-field" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <Label text="No. Telepon" styleClass="form-label"/>
+                                    <TextField fx:id="txtPhone" styleClass="text-field" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Label text="Username" styleClass="form-label"/>
+                                    <TextField fx:id="txtUsernameDisp" styleClass="text-field"
+                                               editable="false"
+                                               style="-fx-background-color:#F8F9FA;" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                                      GridPane.columnSpan="2">
+                                    <Label text="Alamat" styleClass="form-label"/>
+                                    <TextArea fx:id="txtAddress" prefRowCount="3" maxWidth="Infinity"
+                                              style="-fx-background-color:white;-fx-border-color:#DEE2E6;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10 14;-fx-font-size:13px;"/>
+                                </VBox>
+                            </GridPane>
+                            <Button text="💾 Simpan Profil" styleClass="btn-primary"
+                                    onAction="#handleSave" style="-fx-padding:10 28;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ════════════════════════════════════════
+                         SECTION PEMBELI — Ubah Password
+                         (disembunyikan untuk penjual)
+                    ════════════════════════════════════════ -->
+                    <VBox fx:id="sectionUbahPassword" spacing="14">
+                        <VBox styleClass="card" spacing="14">
+                            <Label text="🔒 Ubah Kata Sandi"
+                                   style="-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+
+                            <Label fx:id="lblPwdMsg" text="" wrapText="true" maxWidth="500"
+                                   style="-fx-font-size:12px;" visible="false" managed="false"/>
+
+                            <HBox spacing="14">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Kata Sandi Baru" styleClass="form-label"/>
+                                    <PasswordField fx:id="txtNewPwd" styleClass="password-field"
+                                                   promptText="Min. 6 karakter" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Konfirmasi Kata Sandi" styleClass="form-label"/>
+                                    <PasswordField fx:id="txtConfirmPwd" styleClass="password-field"
+                                                   promptText="Ulangi kata sandi baru" maxWidth="Infinity"/>
+                                </VBox>
+                            </HBox>
+                            <Button text="🔑 Ubah Kata Sandi" styleClass="btn-outline"
+                                    onAction="#handleChangePwd" style="-fx-padding:10 24;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ════════════════════════════════════════
+                         SECTION PENJUAL — Ubah Username & Kata Sandi
+                         (disembunyikan untuk pembeli, tampil untuk penjual)
+                    ════════════════════════════════════════ -->
+                    <VBox fx:id="sectionSellerCred" spacing="14" visible="false" managed="false">
+                        <Label text="🔐 Keamanan Akun"
+                               style="-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+
+                        <Label fx:id="lblSellerCredMsg" text="" wrapText="true" maxWidth="500"
+                               style="-fx-font-size:12px;" visible="false" managed="false"/>
+
+                        <!-- Ubah Username -->
+                        <VBox styleClass="card" spacing="14">
+                            <VBox spacing="3">
+                                <Label text="👤 Ubah Username"
+                                       style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                                <Label text="Masukkan kata sandi lama untuk memverifikasi identitas Anda."
+                                       style="-fx-font-size:11px;-fx-text-fill:#6C757D;" wrapText="true"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Username Baru" styleClass="form-label"/>
+                                <TextField fx:id="txtSellerUsername" styleClass="text-field"
+                                           promptText="Min. 3 karakter" maxWidth="Infinity"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Kata Sandi Lama (verifikasi)" styleClass="form-label"
+                                       style="-fx-text-fill:#C0392B;-fx-font-weight:bold;"/>
+                                <PasswordField fx:id="txtSellerOldPwd" styleClass="password-field"
+                                               promptText="Wajib diisi" maxWidth="Infinity"/>
+                            </VBox>
+
+                            <Button text="✏️ Simpan Username" styleClass="btn-primary"
+                                    onAction="#handleSellerSaveUsername" style="-fx-padding:10 28;"/>
+                        </VBox>
+
+                        <!-- Ubah Kata Sandi -->
+                        <VBox styleClass="card" spacing="14">
+                            <VBox spacing="3">
+                                <Label text="🔒 Ubah Kata Sandi"
+                                       style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#1A1A2E;"/>
+                                <Label text="Masukkan kata sandi lama lalu isi kata sandi baru."
+                                       style="-fx-font-size:11px;-fx-text-fill:#6C757D;" wrapText="true"/>
+                            </VBox>
+
+                            <Label fx:id="lblSellerPwdMsg" text="" wrapText="true" maxWidth="500"
+                                   style="-fx-font-size:12px;" visible="false" managed="false"/>
+
+                            <VBox spacing="5">
+                                <Label text="Kata Sandi Lama (verifikasi)" styleClass="form-label"
+                                       style="-fx-text-fill:#C0392B;-fx-font-weight:bold;"/>
+                                <PasswordField fx:id="txtSellerOldPwdForPwd" styleClass="password-field"
+                                               promptText="Wajib diisi" maxWidth="Infinity"/>
+                            </VBox>
+
+                            <HBox spacing="14">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Kata Sandi Baru" styleClass="form-label"/>
+                                    <PasswordField fx:id="txtSellerNewPwd" styleClass="password-field"
+                                                   promptText="Min. 6 karakter" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Konfirmasi Kata Sandi Baru" styleClass="form-label"/>
+                                    <PasswordField fx:id="txtSellerConfirmPwd" styleClass="password-field"
+                                                   promptText="Ulangi kata sandi baru" maxWidth="Infinity"/>
+                                </VBox>
+                            </HBox>
+
+                            <Button text="🔑 Simpan Kata Sandi" styleClass="btn-outline"
+                                    onAction="#handleSellerSavePassword" style="-fx-padding:10 24;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Logout (selalu tampil) -->
+                    <Button text="🚪 Keluar dari Akun" styleClass="btn-danger"
+                            onAction="#handleLogout" style="-fx-padding:10 24;"/>
+
+                </VBox>
+            </HBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
