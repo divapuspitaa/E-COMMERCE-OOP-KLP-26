@@ -159,7 +159,7 @@ public final class UIFactory {
 
     // ── Navbar ───────────────────────────────────────────────────────────────────
     public static HBox navbar(String title, String username, String role, Runnable onLogout) {
-        Label logo = new Label("ZALORA");
+        Label logo = new Label("DIVERYU26");
         logo.setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: " + Theme.WHITE + "; -fx-letter-spacing: 3;");
 
         Label titleLbl = new Label("/ " + title);

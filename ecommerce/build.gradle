@@ -1,7 +1,0 @@
-// AetherCart 26 — Root build file
-
-subprojects {
-    repositories {
-        mavenCentral()
-    }
-}

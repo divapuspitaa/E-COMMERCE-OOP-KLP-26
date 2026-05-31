@@ -40,7 +40,7 @@ public class RegisterScreen {
         header.setAlignment(Pos.CENTER_LEFT);
         header.setStyle("-fx-background-color: " + Theme.BLACK + ";");
 
-        Label logo = new Label("ZALORA");
+        Label logo = new Label("DIVERYU26");
         logo.setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: " + Theme.WHITE + "; -fx-letter-spacing: 3;");
 
         Label slash = new Label(" / Daftarkan Akun");
@@ -159,7 +159,9 @@ public class RegisterScreen {
                 }
             }
 
-            String id = DataStore.getInstance().generateId();
+            String id = (role == User.Role.ADMIN)
+                    ? DataStore.getInstance().generateAdminId()
+                    : DataStore.getInstance().generateId();
             User newUser = switch (role) {
                 case ADMIN    -> new Admin(id, username, password, email);
                 case SELLER   -> new Seller(id, username, password, email);

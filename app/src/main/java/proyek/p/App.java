@@ -11,7 +11,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
-        stage.setTitle("AETHERCART26 — E-Commerce Platform");
+        stage.setTitle("DIVERYU26 — E-Commerce Platform");
         stage.setMinWidth(1100);
         stage.setMinHeight(720);
         showLogin();

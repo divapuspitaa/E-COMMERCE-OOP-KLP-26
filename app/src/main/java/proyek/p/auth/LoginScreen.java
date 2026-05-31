@@ -72,7 +72,7 @@ public class LoginScreen {
         c2.setTranslateY(-40);
 
         // Logo
-        Label logo = new Label("ZALORA");
+        Label logo = new Label("DIVERYU26");
         logo.setStyle(
             "-fx-font-size: 48; -fx-font-weight: bold; " +
             "-fx-text-fill: " + Theme.WHITE + "; " +

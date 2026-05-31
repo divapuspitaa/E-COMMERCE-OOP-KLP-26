@@ -7,10 +7,11 @@ import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -18,6 +19,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -26,6 +29,7 @@ import proyek.p.App;
 import proyek.p.model.Customer;
 import proyek.p.model.DataStore;
 import proyek.p.model.Product;
+import proyek.p.model.Transaction;
 import proyek.p.ui.Theme;
 import proyek.p.ui.UIFactory;
 
@@ -41,13 +45,13 @@ public class CustomerDashboard {
 
     public void show() {
         BorderPane root = new BorderPane();
-        root.setTop(buildTopBar());
+        root.setTop(buildTopBar(root));
         root.setCenter(wrapScroll(buildShopPanel()));
         root.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
 
         Scene scene = new Scene(root, 1200, 760);
         stage.setScene(scene);
-        stage.setTitle("ZALORA — Belanja");
+        stage.setTitle("DIVERYU26 — Belanja");
 
         root.setOpacity(0);
         FadeTransition ft = new FadeTransition(Duration.millis(400), root);
@@ -56,7 +60,7 @@ public class CustomerDashboard {
     }
 
     // ── Top Bar with search ───────────────────────────────────────────────────────
-    private VBox buildTopBar() {
+    private VBox buildTopBar(BorderPane root) {
         HBox navbar = UIFactory.navbar("Belanja", customer.getUsername(), "CUSTOMER", App::showLogin);
 
         // Category tabs under nav
@@ -76,6 +80,21 @@ public class CustomerDashboard {
             });
             cats.getChildren().add(btn);
         }
+
+        // Riwayat tab
+        ToggleButton btnRiwayat = catTabBtn("📋 Riwayat", catGroup, false);
+        btnRiwayat.setOnAction(e -> {
+            BorderPane bp = (BorderPane) stage.getScene().getRoot();
+            bp.setCenter(wrapScroll(buildRiwayatPanel()));
+        });
+        cats.getChildren().add(btnRiwayat);
+
+        ToggleButton btnProfil = catTabBtn("👤 Profil", catGroup, false);
+        btnProfil.setOnAction(e -> {
+            BorderPane bp = (BorderPane) stage.getScene().getRoot();
+            bp.setCenter(wrapScroll(buildProfilePanel()));
+        });
+        cats.getChildren().add(btnProfil);
 
         // Search bar row
         HBox searchRow = new HBox(12);
@@ -163,12 +182,10 @@ public class CustomerDashboard {
     }
 
     private VBox buildProductCard(Product product) {
-        // Color block as "image"
         String[] colors = { "#E8F4F0", "#FFF0F0", "#F0F0FF", "#FFFAF0", "#F0FFF4", "#FFF5E0" };
         int colorIdx = Math.abs(product.getId().hashCode()) % colors.length;
         String bgColor = colors[colorIdx];
 
-        // Emoji based on category
         String emoji = switch (product.getCategory()) {
             case "Sepatu"     -> "👟";
             case "Pakaian"    -> "👕";
@@ -178,7 +195,6 @@ public class CustomerDashboard {
             default           -> "🛍";
         };
 
-        // Image placeholder
         StackPane imgBox = new StackPane();
         imgBox.setPrefSize(200, 160);
         imgBox.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 8 8 0 0;");
@@ -186,35 +202,25 @@ public class CustomerDashboard {
         emojiLbl.setStyle("-fx-font-size: 52;");
         imgBox.getChildren().add(emojiLbl);
 
-        // Category badge
         Label catBadge = UIFactory.badge(product.getCategory(), Theme.ACCENT);
 
-        // Product name
         Label nameLbl = new Label(product.getName());
         nameLbl.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + "; -fx-wrap-text: true;");
         nameLbl.setMaxWidth(190);
         nameLbl.setWrapText(true);
 
-        // Seller
         Label sellerLbl = new Label("oleh " + product.getSellerName());
         sellerLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
 
-        // Price
         Label priceLbl = new Label(product.getFormattedPrice());
         priceLbl.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
 
-        // Stock indicator
         Label stockLbl = UIFactory.badge("Stok: " + product.getStock(), product.getStock() > 5 ? Theme.SUCCESS : Theme.WARNING);
 
         HBox priceRow = new HBox(8, priceLbl);
         priceRow.setAlignment(Pos.CENTER_LEFT);
 
-        // Buy button
-        Button buyBtn = UIFactory.accentBtn("Beli Sekarang");
-        buyBtn.setPrefWidth(200);
-        buyBtn.setOnAction(e -> showProductDetail(product));
-
-        Button detailBtn = UIFactory.outlineBtn("Detail");
+        Button detailBtn = UIFactory.outlineBtn("Lihat Detail");
         detailBtn.setPrefWidth(200);
         detailBtn.setOnAction(e -> showProductDetail(product));
 
@@ -230,7 +236,6 @@ public class CustomerDashboard {
             "-fx-cursor: hand;"
         );
 
-        // Hover effect
         card.setOnMouseEntered(e -> card.setStyle(
             "-fx-background-color: " + Theme.WHITE + ";" +
             "-fx-background-radius: 12;" +
@@ -266,7 +271,6 @@ public class CustomerDashboard {
             default          -> "🛍";
         };
 
-        // Image area
         StackPane imgArea = new StackPane();
         imgArea.setPrefSize(460, 220);
         imgArea.setStyle("-fx-background-color: " + colors[colorIdx] + ";");
@@ -274,7 +278,6 @@ public class CustomerDashboard {
         emojiLbl.setStyle("-fx-font-size: 80;");
         imgArea.getChildren().add(emojiLbl);
 
-        // Info
         Label catBadge  = UIFactory.badge(product.getCategory(), Theme.ACCENT);
         Label nameLabel = new Label(product.getName());
         nameLabel.setStyle("-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
@@ -288,23 +291,39 @@ public class CustomerDashboard {
         descLbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
         descLbl.setWrapText(true);
 
-        Spinner<Integer> qtySpinner = new Spinner<>(1, product.getStock(), 1);
+        Spinner<Integer> qtySpinner = new Spinner<>(1, Math.max(1, product.getStock()), 1);
         qtySpinner.setStyle(Theme.INPUT_STYLE);
         qtySpinner.setPrefWidth(120);
+
+        Label totalPreview = new Label("Total: " + product.getFormattedPrice());
+        totalPreview.setStyle("-fx-font-size: 14; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        qtySpinner.valueProperty().addListener((obs, o, nw) ->
+            totalPreview.setText("Total: " + String.format("Rp %,.0f", product.getPrice() * nw))
+        );
 
         Button buyBtn = UIFactory.accentBtn("🛒  Beli Sekarang");
         buyBtn.setPrefWidth(280);
         buyBtn.setPrefHeight(48);
         buyBtn.setOnAction(e -> {
             int qty = qtySpinner.getValue();
-            dialog.close();
-            UIFactory.showAlert(
-                "Pembelian Berhasil! 🎉",
-                qty + "x " + product.getName() + "\n" +
-                "Total: " + String.format("Rp %,.0f", product.getPrice() * qty) + "\n\n" +
-                "Terima kasih telah berbelanja di ZALORA!",
-                Alert.AlertType.INFORMATION
+            double total = product.getPrice() * qty;
+
+            // Kurangi stok
+            product.setStock(product.getStock() - qty);
+
+            // Catat transaksi
+            Transaction tx = new Transaction(
+                store.generateId(),
+                customer.getId(), customer.getUsername(),
+                product.getSellerId(), product.getId(), product.getName(),
+                qty, total
             );
+            store.addTransaction(tx);
+
+            dialog.close();
+
+            // Tampilkan halaman sukses
+            showSuccessScene(product, qty, total, tx);
         });
 
         VBox info = new VBox(12,
@@ -312,14 +331,253 @@ public class CustomerDashboard {
             priceLbl, stockLbl, UIFactory.divider(),
             descTitle, descLbl, UIFactory.divider(),
             new HBox(12, UIFactory.formLabel("Jumlah:"), qtySpinner),
+            totalPreview,
             buyBtn
         );
         info.setPadding(new Insets(20));
         info.setStyle("-fx-background-color: " + Theme.WHITE + ";");
 
         VBox root = new VBox(imgArea, info);
-        dialog.setScene(new Scene(root, 460, 640));
+        dialog.setScene(new Scene(root, 460, 660));
         dialog.showAndWait();
+    }
+
+    // ── Halaman Sukses Setelah Beli ───────────────────────────────────────────────
+    private void showSuccessScene(Product product, int qty, double total, Transaction tx) {
+        BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
+        root.setTop(UIFactory.navbar("Pembelian Berhasil", customer.getUsername(), "CUSTOMER", App::showLogin));
+
+        // ── Konten utama sukses ──
+        VBox content = new VBox(0);
+        content.setAlignment(Pos.TOP_CENTER);
+
+        // Hero sukses
+        VBox hero = new VBox(12);
+        hero.setAlignment(Pos.CENTER);
+        hero.setPadding(new Insets(48, 40, 40, 40));
+        hero.setStyle("-fx-background-color: linear-gradient(to bottom, #e8faf7, " + Theme.SURFACE + ");");
+
+        Label checkIcon = new Label("✅");
+        checkIcon.setStyle("-fx-font-size: 64;");
+
+        Label heroTitle = new Label("Pembelian Berhasil!");
+        heroTitle.setStyle("-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+
+        Label heroSub = new Label("Terima kasih telah berbelanja di DIVERYU26");
+        heroSub.setStyle("-fx-font-size: 15; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+
+        Label txId = new Label("ID Transaksi: #" + tx.getId().toUpperCase());
+        txId.setStyle(
+            "-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";" +
+            "-fx-background-color: rgba(0,194,168,0.08);" +
+            "-fx-background-radius: 20;" +
+            "-fx-padding: 6 14 6 14;" +
+            "-fx-border-color: rgba(0,194,168,0.25);" +
+            "-fx-border-radius: 20;"
+        );
+
+        hero.getChildren().addAll(checkIcon, heroTitle, heroSub, txId);
+
+        // ── Detail order card ──
+        String emoji = switch (product.getCategory()) {
+            case "Sepatu"    -> "👟";
+            case "Pakaian"   -> "👕";
+            case "Aksesoris" -> "⌚";
+            case "Tas"       -> "👜";
+            case "Olahraga"  -> "⚽";
+            default          -> "🛍";
+        };
+
+        VBox orderCard = new VBox(16);
+        orderCard.setMaxWidth(560);
+        orderCard.setPadding(new Insets(28));
+        orderCard.setStyle(
+            "-fx-background-color: " + Theme.WHITE + ";" +
+            "-fx-background-radius: 14;" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 14, 0, 0, 4);"
+        );
+
+        Label orderTitle = UIFactory.subheading("📦  Detail Pesanan");
+
+        // Baris produk
+        Label prodEmojiLbl = new Label(emoji);
+        prodEmojiLbl.setStyle("-fx-font-size: 36;");
+        VBox prodInfo = new VBox(4);
+        Label prodName = new Label(product.getName());
+        prodName.setStyle("-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        Label prodSeller = new Label("Dijual oleh: " + product.getSellerName());
+        prodSeller.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        Label prodCat = UIFactory.badge(product.getCategory(), Theme.ACCENT);
+        prodInfo.getChildren().addAll(prodName, prodSeller, prodCat);
+        HBox prodRow = new HBox(16, prodEmojiLbl, prodInfo);
+        prodRow.setAlignment(Pos.CENTER_LEFT);
+
+        Separator sep1 = new Separator();
+
+        // Rincian harga
+        VBox priceDetails = new VBox(8);
+        priceDetails.setStyle(
+            "-fx-background-color: rgba(0,194,168,0.04);" +
+            "-fx-background-radius: 8;" +
+            "-fx-padding: 14;"
+        );
+        HBox rowHarga   = detailRow("Harga satuan", product.getFormattedPrice());
+        HBox rowJumlah  = detailRow("Jumlah", qty + " item");
+        Separator sep2  = new Separator();
+        HBox rowTotal   = detailRowBold("Total Pembayaran", String.format("Rp %,.0f", total));
+        priceDetails.getChildren().addAll(rowHarga, rowJumlah, sep2, rowTotal);
+
+        // Info pengiriman
+        VBox shippingBox = new VBox(6);
+        shippingBox.setStyle(
+            "-fx-background-color: rgba(255,193,7,0.07);" +
+            "-fx-background-radius: 8;" +
+            "-fx-padding: 14;" +
+            "-fx-border-color: rgba(255,193,7,0.3);" +
+            "-fx-border-radius: 8;"
+        );
+        Label shippingTitle = new Label("🚚  Estimasi Pengiriman");
+        shippingTitle.setStyle("-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        Label shippingInfo  = new Label("2–4 hari kerja • Pengiriman reguler");
+        shippingInfo.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+        Label shippingDate  = new Label("Tanggal pesanan: " + tx.getFormattedDate());
+        shippingDate.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        shippingBox.getChildren().addAll(shippingTitle, shippingInfo, shippingDate);
+
+        orderCard.getChildren().addAll(orderTitle, UIFactory.divider(), prodRow, sep1, priceDetails, shippingBox);
+
+        // ── Tombol aksi ──
+        Button btnBelanjLagi = UIFactory.accentBtn("🛍  Lanjut Belanja");
+        btnBelanjLagi.setPrefWidth(220);
+        btnBelanjLagi.setPrefHeight(46);
+        btnBelanjLagi.setOnAction(e -> show());
+
+        Button btnRiwayat = UIFactory.outlineBtn("📋  Lihat Riwayat");
+        btnRiwayat.setPrefWidth(220);
+        btnRiwayat.setPrefHeight(46);
+        btnRiwayat.setOnAction(e -> {
+            BorderPane bp = (BorderPane) stage.getScene().getRoot();
+            bp.setCenter(wrapScroll(buildRiwayatPanel()));
+        });
+
+        HBox btnRow = new HBox(16, btnBelanjLagi, btnRiwayat);
+        btnRow.setAlignment(Pos.CENTER);
+        btnRow.setPadding(new Insets(24, 0, 40, 0));
+
+        VBox centerBox = new VBox(24, hero, orderCard, btnRow);
+        centerBox.setAlignment(Pos.TOP_CENTER);
+        centerBox.setPadding(new Insets(0, 40, 40, 40));
+
+        root.setCenter(wrapScroll(centerBox));
+
+        Scene scene = new Scene(root, 1200, 760);
+        stage.setScene(scene);
+        stage.setTitle("DIVERYU26 — Pembelian Berhasil");
+
+        root.setOpacity(0);
+        FadeTransition ft = new FadeTransition(Duration.millis(500), root);
+        ft.setToValue(1);
+        ft.play();
+    }
+
+    private HBox detailRow(String label, String value) {
+        Label lbl = new Label(label);
+        lbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Label val = new Label(value);
+        val.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        HBox row = new HBox(lbl, spacer, val);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    private HBox detailRowBold(String label, String value) {
+        Label lbl = new Label(label);
+        lbl.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Label val = new Label(value);
+        val.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: " + Theme.ACCENT + ";");
+        HBox row = new HBox(lbl, spacer, val);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    // ── Panel Riwayat Pembelian ───────────────────────────────────────────────────
+    private VBox buildRiwayatPanel() {
+        VBox panel = new VBox(24);
+        panel.setPadding(new Insets(32));
+
+        Label title    = UIFactory.heading("📋 Riwayat Pembelian");
+        Label subtitle = UIFactory.bodyText("Semua transaksi yang pernah Anda lakukan.");
+
+        List<Transaction> txList = store.getTransactionsByCustomer(customer.getId());
+
+        double totalBelanja = txList.stream().mapToDouble(Transaction::getTotalPrice).sum();
+
+        // Stat card
+        HBox stats = new HBox(16,
+            UIFactory.statCard(String.valueOf(txList.size()), "Total Transaksi", Theme.ACCENT),
+            UIFactory.statCard(String.format("Rp %,.0f", totalBelanja), "Total Belanja", Theme.SUCCESS)
+        );
+
+        if (txList.isEmpty()) {
+            VBox emptyBox = new VBox(12);
+            emptyBox.setAlignment(Pos.CENTER);
+            emptyBox.setPadding(new Insets(60));
+            Label emptyIcon = new Label("🛒");
+            emptyIcon.setStyle("-fx-font-size: 52;");
+            Label emptyMsg  = new Label("Belum ada transaksi");
+            emptyMsg.setStyle("-fx-font-size: 16; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+            Label emptyHint = UIFactory.caption("Mulai belanja dan riwayat akan muncul di sini.");
+            emptyBox.getChildren().addAll(emptyIcon, emptyMsg, emptyHint);
+            panel.getChildren().addAll(title, subtitle, stats, emptyBox);
+            return panel;
+        }
+
+        VBox txCards = new VBox(12);
+        for (Transaction tx : txList) {
+            txCards.getChildren().add(buildTransactionCard(tx));
+        }
+
+        panel.getChildren().addAll(title, subtitle, stats, txCards);
+        return panel;
+    }
+
+    private VBox buildTransactionCard(Transaction tx) {
+        VBox card = new VBox(10);
+        card.setPadding(new Insets(18));
+        card.setStyle(
+            "-fx-background-color: " + Theme.WHITE + ";" +
+            "-fx-background-radius: 10;" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);"
+        );
+
+        HBox topRow = new HBox(12);
+        topRow.setAlignment(Pos.CENTER_LEFT);
+        Label txIdLbl = new Label("#" + tx.getId().toUpperCase());
+        txIdLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        Region sp = new Region();
+        HBox.setHgrow(sp, Priority.ALWAYS);
+        Label dateLbl = new Label(tx.getFormattedDate());
+        dateLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        topRow.getChildren().addAll(txIdLbl, sp, dateLbl);
+
+        Label prodName = new Label(tx.getProductName());
+        prodName.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+
+        HBox detailRow = new HBox(16);
+        detailRow.setAlignment(Pos.CENTER_LEFT);
+        Label qtyLbl   = UIFactory.badge(tx.getQuantity() + " item", Theme.ACCENT);
+        Label totalLbl = new Label(tx.getFormattedTotal());
+        totalLbl.setStyle("-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: " + Theme.ACCENT + ";");
+        Label statusBadge = UIFactory.badge("✓ Selesai", Theme.SUCCESS);
+        detailRow.getChildren().addAll(qtyLbl, statusBadge, sp, totalLbl);
+
+        card.getChildren().addAll(topRow, prodName, detailRow);
+        return card;
     }
 
     private ScrollPane wrapScroll(javafx.scene.Node content) {
@@ -328,5 +586,126 @@ public class CustomerDashboard {
         sp.setStyle("-fx-background-color: " + Theme.SURFACE + "; -fx-background: " + Theme.SURFACE + ";");
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         return sp;
+    }
+
+    // ── Profile Panel ─────────────────────────────────────────────────────────────
+    private VBox buildProfilePanel() {
+        VBox panel = new VBox(24);
+        panel.setPadding(new Insets(32));
+        panel.setMaxWidth(600);
+
+        Label title    = UIFactory.heading("Profil Saya");
+        Label subtitle = UIFactory.bodyText("Ubah nama akun atau kata sandi Anda.");
+
+        // Info card
+        VBox infoCard = UIFactory.card(
+            infoRow("👤", "Username", customer.getUsername()),
+            infoRow("📧", "Email",    customer.getEmail()),
+            infoRow("🔑", "Role",     "CUSTOMER")
+        );
+
+        // ── Change username card ──
+        TextField newUsernameField = UIFactory.inputField("Username baru");
+        newUsernameField.setText(customer.getUsername());
+        newUsernameField.setPrefWidth(400);
+
+        Button saveUsernameBtn = UIFactory.accentBtn("Simpan Username");
+        saveUsernameBtn.setPrefWidth(400);
+        Label usernameMsg = new Label();
+        usernameMsg.setStyle("-fx-font-size: 12;");
+
+        saveUsernameBtn.setOnAction(e -> {
+            String newName = newUsernameField.getText().trim();
+            if (newName.length() < 4) {
+                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                usernameMsg.setText("Username minimal 4 karakter.");
+                return;
+            }
+            if (store.updateUsername(customer.getId(), newName)) {
+                customer.setUsername(newName);
+                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.SUCCESS + ";");
+                usernameMsg.setText("✅ Username berhasil diperbarui.");
+                show();
+            } else {
+                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                usernameMsg.setText("Username sudah digunakan.");
+            }
+        });
+
+        VBox usernameCard = UIFactory.card(
+            UIFactory.subheading("Ganti Username"),
+            UIFactory.divider(),
+            UIFactory.formField("Username Baru", newUsernameField),
+            usernameMsg,
+            saveUsernameBtn
+        );
+
+        // ── Change password card ──
+        PasswordField currentPassField = UIFactory.passwordField("Kata sandi saat ini");
+        currentPassField.setPrefWidth(400);
+        PasswordField newPassField     = UIFactory.passwordField("Kata sandi baru (min. 6 karakter)");
+        newPassField.setPrefWidth(400);
+        PasswordField confirmPassField = UIFactory.passwordField("Ulangi kata sandi baru");
+        confirmPassField.setPrefWidth(400);
+
+        Button savePassBtn = UIFactory.accentBtn("Simpan Kata Sandi");
+        savePassBtn.setPrefWidth(400);
+        Label passMsg = new Label();
+        passMsg.setStyle("-fx-font-size: 12;");
+
+        savePassBtn.setOnAction(e -> {
+            String current = currentPassField.getText();
+            String newPass  = newPassField.getText();
+            String confirm  = confirmPassField.getText();
+
+            if (!customer.getPassword().equals(current)) {
+                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setText("Kata sandi saat ini tidak cocok.");
+                return;
+            }
+            if (newPass.length() < 6) {
+                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setText("Kata sandi baru minimal 6 karakter.");
+                return;
+            }
+            if (!newPass.equals(confirm)) {
+                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setText("Konfirmasi kata sandi tidak cocok.");
+                return;
+            }
+            store.updatePassword(customer.getId(), newPass);
+            customer.setPassword(newPass);
+            passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.SUCCESS + ";");
+            passMsg.setText("✅ Kata sandi berhasil diperbarui.");
+            currentPassField.clear();
+            newPassField.clear();
+            confirmPassField.clear();
+        });
+
+        VBox passCard = UIFactory.card(
+            UIFactory.subheading("Ganti Kata Sandi"),
+            UIFactory.divider(),
+            UIFactory.formField("Kata Sandi Saat Ini",        currentPassField),
+            UIFactory.formField("Kata Sandi Baru",            newPassField),
+            UIFactory.formField("Konfirmasi Kata Sandi Baru", confirmPassField),
+            passMsg,
+            savePassBtn
+        );
+
+        panel.getChildren().addAll(title, subtitle, infoCard, usernameCard, passCard);
+        return panel;
+    }
+
+    private HBox infoRow(String icon, String label, String value) {
+        Label iconLbl  = new Label(icon);
+        iconLbl.setStyle("-fx-font-size: 16;");
+        Label labelLbl = new Label(label + ":");
+        labelLbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + "; -fx-min-width: 100;");
+        Label valueLbl = new Label(value);
+        valueLbl.setStyle("-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        HBox row = new HBox(12, iconLbl, labelLbl, valueLbl);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(6, 0, 6, 0));
+        return row;
     }
 }

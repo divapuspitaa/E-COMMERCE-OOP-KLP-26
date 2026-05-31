@@ -25,7 +25,9 @@ public abstract class User {
     public String getEmail()      { return email; }
     public Role   getRole()       { return role; }
     public boolean isActive()     { return active; }
-    public void setActive(boolean active) { this.active = active; }
+    public void setActive(boolean active)     { this.active = active; }
+    public void setUsername(String username)  { this.username = username; }
+    public void setPassword(String password)  { this.password = password; }
 
     public abstract String getDashboardTitle();
 }
