@@ -1,7 +1,7 @@
 # DIVERYU — E-Commerce Platform Management System
 
 ## Deskripsi
-Aplikasi JavaFX dengan tiga role: **Admin**, **Seller**, dan **Customer**.  
+Aplikasi JavaFX dengan tiga role: **Admin**, **Seller**, dan **Customer**.
 Tampilan modern bergaya DIVERYU dengan palet hitam & teal.
 
 ---
