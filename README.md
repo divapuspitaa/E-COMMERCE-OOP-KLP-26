@@ -29,9 +29,7 @@ gradlew.bat run
 |----------|---------------|-----------|
 | Admin    | admin         | admin123  |
 | Seller   | budi_seller   | budi123   |
-| Seller   | siti_shop     | siti123   |
 | Customer | andi_buy      | andi123   |
-| Customer | dewi_shop     | dewi123   |
 
 **Admin Secret (untuk daftar akun Admin):** `OOP26`
 
@@ -61,33 +59,54 @@ gradlew.bat run
 ---
 
 ## Struktur Paket
-```
 app/src/main/java/proyek/p/
+
 ├── App.java                    ← Entry point
+│
 ├── model/
 │   ├── User.java               ← Abstract base class (OOP: inheritance)
 │   ├── Admin.java
 │   ├── Seller.java
 │   ├── Customer.java
 │   ├── Product.java
+│   ├── Transaction.java
 │   └── DataStore.java          ← Singleton in-memory storage
+│
+├── controller/
+│   ├── AuthController.java     ← Business logic autentikasi
+│   ├── UserController.java     ← Business logic manajemen user
+│   ├── ProductController.java  ← Business logic produk
+│   └── TransactionController.java ← Business logic transaksi
+│
+├── dao/
+│   ├── UserDAO.java            ← Akses data user
+│   ├── ProductDAO.java         ← Akses data produk
+│   └── TransactionDAO.java     ← Akses data transaksi
+│
 ├── auth/
 │   ├── LoginScreen.java
 │   └── RegisterScreen.java
+│
 ├── admin/
 │   └── AdminDashboard.java
+│
 ├── seller/
 │   └── SellerDashboard.java
+│
 ├── customer/
 │   └── CustomerDashboard.java
+│
 └── ui/
     ├── Theme.java              ← Design tokens
     └── UIFactory.java          ← Reusable UI components
-```
-
+    
 ## Konsep OOP yang Digunakan
-- **Inheritance** — `Admin`, `Seller`, `Customer` extends `User`
-- **Abstraction** — `User` adalah abstract class dengan method `getDashboardTitle()`
-- **Encapsulation** — semua field private dengan getter/setter
-- **Polymorphism** — navigasi dashboard menggunakan `switch` pada `user.getRole()`
-- **Singleton Pattern** — `DataStore.getInstance()`
+1. Inheritance — Admin, Seller, Customer extends User
+2. Abstraction — User adalah abstract class sebagai kerangka dasar seluruh jenis pengguna
+3. Encapsulation — semua field dibuat private dan diakses melalui getter/setter
+4. Polymorphism — objek User dapat direpresentasikan sebagai Admin, Seller, atau Customer sesuai role
+
+KELOMPOK 26 
+1. Erizq Affanditya Nursin_H071251024 - Project Manager
+2. Diva Puspita H071251011 - Anggota
+3. Muslimah Ayu Hafizhah_H071251070 - Anggota
