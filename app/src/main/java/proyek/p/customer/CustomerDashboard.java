@@ -16,13 +16,25 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import proyek.p.App;
@@ -47,7 +59,7 @@ public class CustomerDashboard {
         BorderPane root = new BorderPane();
         root.setTop(buildTopBar(root));
         root.setCenter(wrapScroll(buildShopPanel()));
-        root.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
+        root.setBackground(new Background(new BackgroundFill(Theme.SURFACE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(root, 1200, 760);
         stage.setScene(scene);
@@ -65,7 +77,9 @@ public class CustomerDashboard {
 
         // Category tabs under nav
         HBox cats = new HBox(0);
-        cats.setStyle("-fx-background-color: " + Theme.WHITE + "; -fx-border-color: " + Theme.BORDER + "; -fx-border-width: 0 0 1 0;");
+        cats.setBackground(new Background(new BackgroundFill(Theme.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+        cats.setBorder(new Border(new BorderStroke(Theme.BORDER, BorderStrokeStyle.SOLID,
+            CornerRadii.EMPTY, new BorderWidths(0, 0, 1, 0))));
         cats.setPadding(new Insets(0, 24, 0, 24));
         cats.setAlignment(Pos.CENTER_LEFT);
 
@@ -99,7 +113,7 @@ public class CustomerDashboard {
         // Search bar row
         HBox searchRow = new HBox(12);
         searchRow.setPadding(new Insets(12, 24, 12, 24));
-        searchRow.setStyle("-fx-background-color: " + Theme.WHITE + ";");
+        searchRow.setBackground(new Background(new BackgroundFill(Theme.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
         searchRow.setAlignment(Pos.CENTER_LEFT);
 
         TextField searchField = UIFactory.inputField("🔍  Cari produk, merek, kategori...");
@@ -126,10 +140,34 @@ public class CustomerDashboard {
         btn.setSelected(selected);
         btn.setPrefHeight(44);
         btn.setPadding(new Insets(0, 20, 0, 20));
-        String base = "-fx-background-color: transparent; -fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + "; -fx-cursor: hand; -fx-background-radius: 0;";
-        String sel  = "-fx-background-color: transparent; -fx-font-size: 13; -fx-text-fill: " + Theme.BLACK + "; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 0; -fx-border-color: transparent transparent " + Theme.BLACK + " transparent; -fx-border-width: 0 0 2 0;";
-        btn.setStyle(selected ? sel : base);
-        btn.selectedProperty().addListener((obs, o, nw) -> btn.setStyle(nw ? sel : base));
+        btn.setCursor(javafx.scene.Cursor.HAND);
+        btn.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        if (selected) {
+            btn.setFont(Theme.bodyFontBold(13));
+            btn.setTextFill(Theme.TEXT_PRIMARY);
+            btn.setBorder(new Border(new BorderStroke(
+                Theme.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 2, 0)
+            )));
+        } else {
+            btn.setFont(Theme.bodyFont(13));
+            btn.setTextFill(Theme.TEXT_SECONDARY);
+            btn.setBorder(Border.EMPTY);
+        }
+
+        btn.selectedProperty().addListener((obs, o, nw) -> {
+            if (nw) {
+                btn.setFont(Theme.bodyFontBold(13));
+                btn.setTextFill(Theme.TEXT_PRIMARY);
+                btn.setBorder(new Border(new BorderStroke(
+                    Theme.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 2, 0)
+                )));
+            } else {
+                btn.setFont(Theme.bodyFont(13));
+                btn.setTextFill(Theme.TEXT_SECONDARY);
+                btn.setBorder(Border.EMPTY);
+            }
+        });
         return btn;
     }
 
@@ -170,7 +208,9 @@ public class CustomerDashboard {
 
         if (products.isEmpty()) {
             Label empty = new Label("😔 Tidak ada produk ditemukan");
-            empty.setStyle("-fx-font-size: 16; -fx-text-fill: " + Theme.TEXT_MUTED + "; -fx-padding: 40;");
+            empty.setFont(Theme.bodyFont(16));
+            empty.setTextFill(Theme.TEXT_MUTED);
+            empty.setPadding(new Insets(40));
             grid.getChildren().add(empty);
             return grid;
         }
@@ -197,23 +237,28 @@ public class CustomerDashboard {
 
         StackPane imgBox = new StackPane();
         imgBox.setPrefSize(200, 160);
-        imgBox.setStyle("-fx-background-color: " + bgColor + "; -fx-background-radius: 8 8 0 0;");
+        imgBox.setBackground(new Background(new BackgroundFill(
+            Color.web(bgColor), new CornerRadii(8, 8, 0, 0, false), Insets.EMPTY
+        )));
         Label emojiLbl = new Label(emoji);
-        emojiLbl.setStyle("-fx-font-size: 52;");
+        emojiLbl.setFont(Theme.bodyFont(52));
         imgBox.getChildren().add(emojiLbl);
 
         Label catBadge = UIFactory.badge(product.getCategory(), Theme.ACCENT);
 
         Label nameLbl = new Label(product.getName());
-        nameLbl.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + "; -fx-wrap-text: true;");
-        nameLbl.setMaxWidth(190);
+        nameLbl.setFont(Theme.bodyFontBold(14));
+        nameLbl.setTextFill(Theme.TEXT_PRIMARY);
         nameLbl.setWrapText(true);
+        nameLbl.setMaxWidth(190);
 
         Label sellerLbl = new Label("oleh " + product.getSellerName());
-        sellerLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        sellerLbl.setFont(Theme.bodyFont(11));
+        sellerLbl.setTextFill(Theme.TEXT_MUTED);
 
         Label priceLbl = new Label(product.getFormattedPrice());
-        priceLbl.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        priceLbl.setFont(Theme.bodyFontBold(16));
+        priceLbl.setTextFill(Theme.TEXT_PRIMARY);
 
         Label stockLbl = UIFactory.badge("Stok: " + product.getStock(), product.getStock() > 5 ? Theme.SUCCESS : Theme.WARNING);
 
@@ -227,28 +272,30 @@ public class CustomerDashboard {
         VBox info = new VBox(6, catBadge, nameLbl, sellerLbl, priceRow, stockLbl, detailBtn);
         info.setPadding(new Insets(14));
 
+        DropShadow normalShadow = new DropShadow();
+        normalShadow.setColor(Color.rgb(0, 0, 0, 0.06));
+        normalShadow.setRadius(10);
+        normalShadow.setOffsetY(3);
+
+        DropShadow hoverShadow = new DropShadow();
+        hoverShadow.setColor(Color.rgb(0, 0, 0, 0.14));
+        hoverShadow.setRadius(20);
+        hoverShadow.setOffsetY(6);
+
         VBox card = new VBox(0, imgBox, info);
         card.setPrefWidth(218);
-        card.setStyle(
-            "-fx-background-color: " + Theme.WHITE + ";" +
-            "-fx-background-radius: 12;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 3);" +
-            "-fx-cursor: hand;"
-        );
+        card.setBackground(new Background(new BackgroundFill(Theme.WHITE, new CornerRadii(12), Insets.EMPTY)));
+        card.setEffect(normalShadow);
+        card.setCursor(javafx.scene.Cursor.HAND);
 
-        card.setOnMouseEntered(e -> card.setStyle(
-            "-fx-background-color: " + Theme.WHITE + ";" +
-            "-fx-background-radius: 12;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.14), 20, 0, 0, 6);" +
-            "-fx-cursor: hand;" +
-            "-fx-translate-y: -3;"
-        ));
-        card.setOnMouseExited(e -> card.setStyle(
-            "-fx-background-color: " + Theme.WHITE + ";" +
-            "-fx-background-radius: 12;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 3);" +
-            "-fx-cursor: hand;"
-        ));
+        card.setOnMouseEntered(e -> {
+            card.setEffect(hoverShadow);
+            card.setTranslateY(-3);
+        });
+        card.setOnMouseExited(e -> {
+            card.setEffect(normalShadow);
+            card.setTranslateY(0);
+        });
         card.setOnMouseClicked(e -> showProductDetail(product));
 
         return card;
@@ -273,30 +320,33 @@ public class CustomerDashboard {
 
         StackPane imgArea = new StackPane();
         imgArea.setPrefSize(460, 220);
-        imgArea.setStyle("-fx-background-color: " + colors[colorIdx] + ";");
+        imgArea.setBackground(new Background(new BackgroundFill(Color.web(colors[colorIdx]), CornerRadii.EMPTY, Insets.EMPTY)));
         Label emojiLbl = new Label(emoji);
-        emojiLbl.setStyle("-fx-font-size: 80;");
+        emojiLbl.setFont(Theme.bodyFont(80));
         imgArea.getChildren().add(emojiLbl);
 
         Label catBadge  = UIFactory.badge(product.getCategory(), Theme.ACCENT);
         Label nameLabel = new Label(product.getName());
-        nameLabel.setStyle("-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        nameLabel.setFont(Theme.bodyFontBold(22));
+        nameLabel.setTextFill(Theme.TEXT_PRIMARY);
         nameLabel.setWrapText(true);
         Label sellerLbl = UIFactory.bodyText("Dijual oleh: " + product.getSellerName());
         Label priceLbl  = new Label(product.getFormattedPrice());
-        priceLbl.setStyle("-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        priceLbl.setFont(Theme.bodyFontBold(24));
+        priceLbl.setTextFill(Theme.TEXT_PRIMARY);
         Label stockLbl  = UIFactory.badge("Stok tersedia: " + product.getStock(), Theme.SUCCESS);
         Label descTitle = UIFactory.subheading("Deskripsi");
         Label descLbl   = new Label(product.getDescription());
-        descLbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+        descLbl.setFont(Theme.bodyFont(13));
+        descLbl.setTextFill(Theme.TEXT_SECONDARY);
         descLbl.setWrapText(true);
 
         Spinner<Integer> qtySpinner = new Spinner<>(1, Math.max(1, product.getStock()), 1);
-        qtySpinner.setStyle(Theme.INPUT_STYLE);
         qtySpinner.setPrefWidth(120);
 
         Label totalPreview = new Label("Total: " + product.getFormattedPrice());
-        totalPreview.setStyle("-fx-font-size: 14; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        totalPreview.setFont(Theme.bodyFont(14));
+        totalPreview.setTextFill(Theme.TEXT_MUTED);
         qtySpinner.valueProperty().addListener((obs, o, nw) ->
             totalPreview.setText("Total: " + String.format("Rp %,.0f", product.getPrice() * nw))
         );
@@ -308,10 +358,8 @@ public class CustomerDashboard {
             int qty = qtySpinner.getValue();
             double total = product.getPrice() * qty;
 
-            // Kurangi stok
             product.setStock(product.getStock() - qty);
 
-            // Catat transaksi
             Transaction tx = new Transaction(
                 store.generateId(),
                 customer.getId(), customer.getUsername(),
@@ -321,8 +369,6 @@ public class CustomerDashboard {
             store.addTransaction(tx);
 
             dialog.close();
-
-            // Tampilkan halaman sukses
             showSuccessScene(product, qty, total, tx);
         });
 
@@ -335,7 +381,7 @@ public class CustomerDashboard {
             buyBtn
         );
         info.setPadding(new Insets(20));
-        info.setStyle("-fx-background-color: " + Theme.WHITE + ";");
+        info.setBackground(new Background(new BackgroundFill(Theme.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         VBox root = new VBox(imgArea, info);
         dialog.setScene(new Scene(root, 460, 660));
@@ -345,10 +391,9 @@ public class CustomerDashboard {
     // ── Halaman Sukses Setelah Beli ───────────────────────────────────────────────
     private void showSuccessScene(Product product, int qty, double total, Transaction tx) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
+        root.setBackground(new Background(new BackgroundFill(Theme.SURFACE, CornerRadii.EMPTY, Insets.EMPTY)));
         root.setTop(UIFactory.navbar("Pembelian Berhasil", customer.getUsername(), "CUSTOMER", App::showLogin));
 
-        // ── Konten utama sukses ──
         VBox content = new VBox(0);
         content.setAlignment(Pos.TOP_CENTER);
 
@@ -356,26 +401,34 @@ public class CustomerDashboard {
         VBox hero = new VBox(12);
         hero.setAlignment(Pos.CENTER);
         hero.setPadding(new Insets(48, 40, 40, 40));
-        hero.setStyle("-fx-background-color: linear-gradient(to bottom, #e8faf7, " + Theme.SURFACE + ");");
+        Stop[] heroStops = new Stop[] {
+            new Stop(0, Color.web("#e8faf7")),
+            new Stop(1, Theme.SURFACE)
+        };
+        LinearGradient heroGradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE, heroStops);
+        hero.setBackground(new Background(new BackgroundFill(heroGradient, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Label checkIcon = new Label("✅");
-        checkIcon.setStyle("-fx-font-size: 64;");
+        checkIcon.setFont(Theme.bodyFont(64));
 
         Label heroTitle = new Label("Pembelian Berhasil!");
-        heroTitle.setStyle("-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        heroTitle.setFont(Theme.bodyFontBold(28));
+        heroTitle.setTextFill(Theme.TEXT_PRIMARY);
 
         Label heroSub = new Label("Terima kasih telah berbelanja di DIVERYU26");
-        heroSub.setStyle("-fx-font-size: 15; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+        heroSub.setFont(Theme.bodyFont(15));
+        heroSub.setTextFill(Theme.TEXT_SECONDARY);
 
         Label txId = new Label("ID Transaksi: #" + tx.getId().toUpperCase());
-        txId.setStyle(
-            "-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";" +
-            "-fx-background-color: rgba(0,194,168,0.08);" +
-            "-fx-background-radius: 20;" +
-            "-fx-padding: 6 14 6 14;" +
-            "-fx-border-color: rgba(0,194,168,0.25);" +
-            "-fx-border-radius: 20;"
-        );
+        txId.setFont(Theme.bodyFont(11));
+        txId.setTextFill(Theme.TEXT_MUTED);
+        txId.setBackground(new Background(new BackgroundFill(
+            Color.web(Theme.ACCENT_HEX, 0.08), new CornerRadii(20), Insets.EMPTY
+        )));
+        txId.setPadding(new Insets(6, 14, 6, 14));
+        txId.setBorder(new Border(new BorderStroke(
+            Color.web(Theme.ACCENT_HEX, 0.25), BorderStrokeStyle.SOLID, new CornerRadii(20), new BorderWidths(1)
+        )));
 
         hero.getChildren().addAll(checkIcon, heroTitle, heroSub, txId);
 
@@ -389,25 +442,28 @@ public class CustomerDashboard {
             default          -> "🛍";
         };
 
+        DropShadow orderShadow = new DropShadow();
+        orderShadow.setColor(Color.rgb(0, 0, 0, 0.07));
+        orderShadow.setRadius(14);
+        orderShadow.setOffsetY(4);
+
         VBox orderCard = new VBox(16);
         orderCard.setMaxWidth(560);
         orderCard.setPadding(new Insets(28));
-        orderCard.setStyle(
-            "-fx-background-color: " + Theme.WHITE + ";" +
-            "-fx-background-radius: 14;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 14, 0, 0, 4);"
-        );
+        orderCard.setBackground(new Background(new BackgroundFill(Theme.WHITE, new CornerRadii(14), Insets.EMPTY)));
+        orderCard.setEffect(orderShadow);
 
         Label orderTitle = UIFactory.subheading("📦  Detail Pesanan");
 
-        // Baris produk
         Label prodEmojiLbl = new Label(emoji);
-        prodEmojiLbl.setStyle("-fx-font-size: 36;");
+        prodEmojiLbl.setFont(Theme.bodyFont(36));
         VBox prodInfo = new VBox(4);
         Label prodName = new Label(product.getName());
-        prodName.setStyle("-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        prodName.setFont(Theme.bodyFontBold(15));
+        prodName.setTextFill(Theme.TEXT_PRIMARY);
         Label prodSeller = new Label("Dijual oleh: " + product.getSellerName());
-        prodSeller.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        prodSeller.setFont(Theme.bodyFont(12));
+        prodSeller.setTextFill(Theme.TEXT_MUTED);
         Label prodCat = UIFactory.badge(product.getCategory(), Theme.ACCENT);
         prodInfo.getChildren().addAll(prodName, prodSeller, prodCat);
         HBox prodRow = new HBox(16, prodEmojiLbl, prodInfo);
@@ -417,11 +473,10 @@ public class CustomerDashboard {
 
         // Rincian harga
         VBox priceDetails = new VBox(8);
-        priceDetails.setStyle(
-            "-fx-background-color: rgba(0,194,168,0.04);" +
-            "-fx-background-radius: 8;" +
-            "-fx-padding: 14;"
-        );
+        priceDetails.setBackground(new Background(new BackgroundFill(
+            Color.web(Theme.ACCENT_HEX, 0.04), new CornerRadii(8), Insets.EMPTY
+        )));
+        priceDetails.setPadding(new Insets(14));
         HBox rowHarga   = detailRow("Harga satuan", product.getFormattedPrice());
         HBox rowJumlah  = detailRow("Jumlah", qty + " item");
         Separator sep2  = new Separator();
@@ -430,19 +485,22 @@ public class CustomerDashboard {
 
         // Info pengiriman
         VBox shippingBox = new VBox(6);
-        shippingBox.setStyle(
-            "-fx-background-color: rgba(255,193,7,0.07);" +
-            "-fx-background-radius: 8;" +
-            "-fx-padding: 14;" +
-            "-fx-border-color: rgba(255,193,7,0.3);" +
-            "-fx-border-radius: 8;"
-        );
+        shippingBox.setBackground(new Background(new BackgroundFill(
+            Color.rgb(255, 193, 7, 0.07), new CornerRadii(8), Insets.EMPTY
+        )));
+        shippingBox.setPadding(new Insets(14));
+        shippingBox.setBorder(new Border(new BorderStroke(
+            Color.rgb(255, 193, 7, 0.3), BorderStrokeStyle.SOLID, new CornerRadii(8), new BorderWidths(1)
+        )));
         Label shippingTitle = new Label("🚚  Estimasi Pengiriman");
-        shippingTitle.setStyle("-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        shippingTitle.setFont(Theme.bodyFontBold(13));
+        shippingTitle.setTextFill(Theme.TEXT_PRIMARY);
         Label shippingInfo  = new Label("2–4 hari kerja • Pengiriman reguler");
-        shippingInfo.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+        shippingInfo.setFont(Theme.bodyFont(12));
+        shippingInfo.setTextFill(Theme.TEXT_SECONDARY);
         Label shippingDate  = new Label("Tanggal pesanan: " + tx.getFormattedDate());
-        shippingDate.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        shippingDate.setFont(Theme.bodyFont(11));
+        shippingDate.setTextFill(Theme.TEXT_MUTED);
         shippingBox.getChildren().addAll(shippingTitle, shippingInfo, shippingDate);
 
         orderCard.getChildren().addAll(orderTitle, UIFactory.divider(), prodRow, sep1, priceDetails, shippingBox);
@@ -483,11 +541,13 @@ public class CustomerDashboard {
 
     private HBox detailRow(String label, String value) {
         Label lbl = new Label(label);
-        lbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+        lbl.setFont(Theme.bodyFont(13));
+        lbl.setTextFill(Theme.TEXT_SECONDARY);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Label val = new Label(value);
-        val.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        val.setFont(Theme.bodyFont(13));
+        val.setTextFill(Theme.TEXT_PRIMARY);
         HBox row = new HBox(lbl, spacer, val);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
@@ -495,11 +555,13 @@ public class CustomerDashboard {
 
     private HBox detailRowBold(String label, String value) {
         Label lbl = new Label(label);
-        lbl.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        lbl.setFont(Theme.bodyFontBold(14));
+        lbl.setTextFill(Theme.TEXT_PRIMARY);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Label val = new Label(value);
-        val.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: " + Theme.ACCENT + ";");
+        val.setFont(Theme.bodyFontBold(16));
+        val.setTextFill(Theme.ACCENT);
         HBox row = new HBox(lbl, spacer, val);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
@@ -517,10 +579,9 @@ public class CustomerDashboard {
 
         double totalBelanja = txList.stream().mapToDouble(Transaction::getTotalPrice).sum();
 
-        // Stat card
         HBox stats = new HBox(16,
-            UIFactory.statCard(String.valueOf(txList.size()), "Total Transaksi", Theme.ACCENT),
-            UIFactory.statCard(String.format("Rp %,.0f", totalBelanja), "Total Belanja", Theme.SUCCESS)
+            UIFactory.statCard(String.valueOf(txList.size()), "Total Transaksi", Theme.ACCENT_HEX),
+            UIFactory.statCard(String.format("Rp %,.0f", totalBelanja), "Total Belanja", Theme.SUCCESS_HEX)
         );
 
         if (txList.isEmpty()) {
@@ -528,9 +589,10 @@ public class CustomerDashboard {
             emptyBox.setAlignment(Pos.CENTER);
             emptyBox.setPadding(new Insets(60));
             Label emptyIcon = new Label("🛒");
-            emptyIcon.setStyle("-fx-font-size: 52;");
+            emptyIcon.setFont(Theme.bodyFont(52));
             Label emptyMsg  = new Label("Belum ada transaksi");
-            emptyMsg.setStyle("-fx-font-size: 16; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+            emptyMsg.setFont(Theme.bodyFont(16));
+            emptyMsg.setTextFill(Theme.TEXT_MUTED);
             Label emptyHint = UIFactory.caption("Mulai belanja dan riwayat akan muncul di sini.");
             emptyBox.getChildren().addAll(emptyIcon, emptyMsg, emptyHint);
             panel.getChildren().addAll(title, subtitle, stats, emptyBox);
@@ -547,32 +609,38 @@ public class CustomerDashboard {
     }
 
     private VBox buildTransactionCard(Transaction tx) {
+        DropShadow txShadow = new DropShadow();
+        txShadow.setColor(Color.rgb(0, 0, 0, 0.05));
+        txShadow.setRadius(10);
+        txShadow.setOffsetY(2);
+
         VBox card = new VBox(10);
         card.setPadding(new Insets(18));
-        card.setStyle(
-            "-fx-background-color: " + Theme.WHITE + ";" +
-            "-fx-background-radius: 10;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);"
-        );
+        card.setBackground(new Background(new BackgroundFill(Theme.WHITE, new CornerRadii(10), Insets.EMPTY)));
+        card.setEffect(txShadow);
 
         HBox topRow = new HBox(12);
         topRow.setAlignment(Pos.CENTER_LEFT);
         Label txIdLbl = new Label("#" + tx.getId().toUpperCase());
-        txIdLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        txIdLbl.setFont(Theme.bodyFont(11));
+        txIdLbl.setTextFill(Theme.TEXT_MUTED);
         Region sp = new Region();
         HBox.setHgrow(sp, Priority.ALWAYS);
         Label dateLbl = new Label(tx.getFormattedDate());
-        dateLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        dateLbl.setFont(Theme.bodyFont(11));
+        dateLbl.setTextFill(Theme.TEXT_MUTED);
         topRow.getChildren().addAll(txIdLbl, sp, dateLbl);
 
         Label prodName = new Label(tx.getProductName());
-        prodName.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        prodName.setFont(Theme.bodyFontBold(14));
+        prodName.setTextFill(Theme.TEXT_PRIMARY);
 
         HBox detailRow = new HBox(16);
         detailRow.setAlignment(Pos.CENTER_LEFT);
         Label qtyLbl   = UIFactory.badge(tx.getQuantity() + " item", Theme.ACCENT);
         Label totalLbl = new Label(tx.getFormattedTotal());
-        totalLbl.setStyle("-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: " + Theme.ACCENT + ";");
+        totalLbl.setFont(Theme.bodyFontBold(15));
+        totalLbl.setTextFill(Theme.ACCENT);
         Label statusBadge = UIFactory.badge("✓ Selesai", Theme.SUCCESS);
         detailRow.getChildren().addAll(qtyLbl, statusBadge, sp, totalLbl);
 
@@ -583,7 +651,7 @@ public class CustomerDashboard {
     private ScrollPane wrapScroll(javafx.scene.Node content) {
         ScrollPane sp = new ScrollPane(content);
         sp.setFitToWidth(true);
-        sp.setStyle("-fx-background-color: " + Theme.SURFACE + "; -fx-background: " + Theme.SURFACE + ";");
+        sp.setBackground(new Background(new BackgroundFill(Theme.SURFACE, new CornerRadii(0), Insets.EMPTY)));
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         return sp;
     }
@@ -597,7 +665,6 @@ public class CustomerDashboard {
         Label title    = UIFactory.heading("Profil Saya");
         Label subtitle = UIFactory.bodyText("Ubah nama akun atau kata sandi Anda.");
 
-        // Info card
         VBox infoCard = UIFactory.card(
             infoRow("👤", "Username", customer.getUsername()),
             infoRow("📧", "Email",    customer.getEmail()),
@@ -612,22 +679,22 @@ public class CustomerDashboard {
         Button saveUsernameBtn = UIFactory.accentBtn("Simpan Username");
         saveUsernameBtn.setPrefWidth(400);
         Label usernameMsg = new Label();
-        usernameMsg.setStyle("-fx-font-size: 12;");
+        usernameMsg.setFont(Theme.bodyFont(12));
 
         saveUsernameBtn.setOnAction(e -> {
             String newName = newUsernameField.getText().trim();
             if (newName.length() < 4) {
-                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                usernameMsg.setTextFill(Theme.DANGER);
                 usernameMsg.setText("Username minimal 4 karakter.");
                 return;
             }
             if (store.updateUsername(customer.getId(), newName)) {
                 customer.setUsername(newName);
-                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.SUCCESS + ";");
+                usernameMsg.setTextFill(Theme.SUCCESS);
                 usernameMsg.setText("✅ Username berhasil diperbarui.");
                 show();
             } else {
-                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                usernameMsg.setTextFill(Theme.DANGER);
                 usernameMsg.setText("Username sudah digunakan.");
             }
         });
@@ -651,7 +718,7 @@ public class CustomerDashboard {
         Button savePassBtn = UIFactory.accentBtn("Simpan Kata Sandi");
         savePassBtn.setPrefWidth(400);
         Label passMsg = new Label();
-        passMsg.setStyle("-fx-font-size: 12;");
+        passMsg.setFont(Theme.bodyFont(12));
 
         savePassBtn.setOnAction(e -> {
             String current = currentPassField.getText();
@@ -659,23 +726,23 @@ public class CustomerDashboard {
             String confirm  = confirmPassField.getText();
 
             if (!customer.getPassword().equals(current)) {
-                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setTextFill(Theme.DANGER);
                 passMsg.setText("Kata sandi saat ini tidak cocok.");
                 return;
             }
             if (newPass.length() < 6) {
-                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setTextFill(Theme.DANGER);
                 passMsg.setText("Kata sandi baru minimal 6 karakter.");
                 return;
             }
             if (!newPass.equals(confirm)) {
-                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setTextFill(Theme.DANGER);
                 passMsg.setText("Konfirmasi kata sandi tidak cocok.");
                 return;
             }
             store.updatePassword(customer.getId(), newPass);
             customer.setPassword(newPass);
-            passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.SUCCESS + ";");
+            passMsg.setTextFill(Theme.SUCCESS);
             passMsg.setText("✅ Kata sandi berhasil diperbarui.");
             currentPassField.clear();
             newPassField.clear();
@@ -698,11 +765,14 @@ public class CustomerDashboard {
 
     private HBox infoRow(String icon, String label, String value) {
         Label iconLbl  = new Label(icon);
-        iconLbl.setStyle("-fx-font-size: 16;");
+        iconLbl.setFont(Theme.bodyFont(16));
         Label labelLbl = new Label(label + ":");
-        labelLbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + "; -fx-min-width: 100;");
+        labelLbl.setFont(Theme.bodyFont(13));
+        labelLbl.setTextFill(Theme.TEXT_SECONDARY);
+        labelLbl.setMinWidth(100);
         Label valueLbl = new Label(value);
-        valueLbl.setStyle("-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        valueLbl.setFont(Theme.bodyFontBold(13));
+        valueLbl.setTextFill(Theme.TEXT_PRIMARY);
         HBox row = new HBox(12, iconLbl, labelLbl, valueLbl);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(6, 0, 6, 0));

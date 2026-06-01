@@ -2,14 +2,30 @@ package proyek.p.ui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 /**
  * Factory for reusable polished UI components.
@@ -17,57 +33,101 @@ import javafx.scene.Node;
 public final class UIFactory {
     private UIFactory() {}
 
+    // Helper: buat Background solid satu warna
+    private static Background solidBg(Color color, double radius) {
+        BackgroundFill fill = new BackgroundFill(color, new CornerRadii(radius), Insets.EMPTY);
+        return new Background(fill);
+    }
+
+    // Helper: buat Border solid satu warna
+    private static Border solidBorder(Color color, double radius) {
+        BorderStroke stroke = new BorderStroke(color, BorderStrokeStyle.SOLID,
+                new CornerRadii(radius), new BorderWidths(1));
+        return new Border(stroke);
+    }
+
+    // Helper: drop shadow ringan untuk card
+    private static DropShadow cardShadow() {
+        DropShadow ds = new DropShadow();
+        ds.setColor(Color.rgb(0, 0, 0, 0.06));
+        ds.setRadius(12);
+        ds.setOffsetX(0);
+        ds.setOffsetY(3);
+        return ds;
+    }
+
     // ── Labels ───────────────────────────────────────────────────────────────────
     public static Label heading(String text) {
         Label lbl = new Label(text);
-        lbl.setStyle("-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        lbl.setFont(Theme.displayFont(28));
+        lbl.setTextFill(Theme.TEXT_PRIMARY);
         return lbl;
     }
 
     public static Label subheading(String text) {
         Label lbl = new Label(text);
-        lbl.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        lbl.setFont(Theme.bodyFontBold(18));
+        lbl.setTextFill(Theme.TEXT_PRIMARY);
         return lbl;
     }
 
     public static Label caption(String text) {
         Label lbl = new Label(text);
-        lbl.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        lbl.setFont(Theme.bodyFont(12));
+        lbl.setTextFill(Theme.TEXT_MUTED);
         return lbl;
     }
 
     public static Label bodyText(String text) {
         Label lbl = new Label(text);
-        lbl.setStyle("-fx-font-size: 14; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+        lbl.setFont(Theme.bodyFont(14));
+        lbl.setTextFill(Theme.TEXT_SECONDARY);
         return lbl;
     }
 
     // ── Buttons ──────────────────────────────────────────────────────────────────
     public static Button primaryBtn(String text) {
         Button btn = new Button(text);
-        btn.setStyle(Theme.BTN_PRIMARY);
-        btn.setOnMouseEntered(e -> btn.setStyle(Theme.BTN_PRIMARY + "-fx-background-color: #222;"));
-        btn.setOnMouseExited(e  -> btn.setStyle(Theme.BTN_PRIMARY));
+        btn.setFont(Theme.bodyFont(14));
+        btn.setTextFill(Theme.WHITE);
+        btn.setBackground(solidBg(Theme.BLACK, 8));
+        btn.setPadding(new Insets(12, 24, 12, 24));
+        btn.setCursor(javafx.scene.Cursor.HAND);
+        btn.setOnMouseEntered(e -> btn.setBackground(solidBg(Color.web("#222222"), 8)));
+        btn.setOnMouseExited(e  -> btn.setBackground(solidBg(Theme.BLACK, 8)));
         return btn;
     }
 
     public static Button accentBtn(String text) {
         Button btn = new Button(text);
-        btn.setStyle(Theme.BTN_ACCENT);
-        btn.setOnMouseEntered(e -> btn.setStyle(Theme.BTN_ACCENT + "-fx-background-color: " + Theme.ACCENT_DARK + ";"));
-        btn.setOnMouseExited(e  -> btn.setStyle(Theme.BTN_ACCENT));
+        btn.setFont(Theme.bodyFont(14));
+        btn.setTextFill(Theme.WHITE);
+        btn.setBackground(solidBg(Theme.ACCENT, 8));
+        btn.setPadding(new Insets(12, 24, 12, 24));
+        btn.setCursor(javafx.scene.Cursor.HAND);
+        btn.setOnMouseEntered(e -> btn.setBackground(solidBg(Theme.ACCENT_DARK, 8)));
+        btn.setOnMouseExited(e  -> btn.setBackground(solidBg(Theme.ACCENT, 8)));
         return btn;
     }
 
     public static Button dangerBtn(String text) {
         Button btn = new Button(text);
-        btn.setStyle(Theme.BTN_DANGER);
+        btn.setFont(Theme.bodyFont(14));
+        btn.setTextFill(Theme.WHITE);
+        btn.setBackground(solidBg(Theme.DANGER, 8));
+        btn.setPadding(new Insets(10, 20, 10, 20));
+        btn.setCursor(javafx.scene.Cursor.HAND);
         return btn;
     }
 
     public static Button outlineBtn(String text) {
         Button btn = new Button(text);
-        btn.setStyle(Theme.BTN_OUTLINE);
+        btn.setFont(Theme.bodyFont(14));
+        btn.setTextFill(Theme.BLACK);
+        btn.setBackground(solidBg(Color.TRANSPARENT, 8));
+        btn.setBorder(solidBorder(Theme.BLACK, 8));
+        btn.setPadding(new Insets(11, 23, 11, 23));
+        btn.setCursor(javafx.scene.Cursor.HAND);
         return btn;
     }
 
@@ -75,7 +135,10 @@ public final class UIFactory {
     public static TextField inputField(String prompt) {
         TextField tf = new TextField();
         tf.setPromptText(prompt);
-        tf.setStyle(Theme.INPUT_STYLE);
+        tf.setFont(Theme.bodyFont(14));
+        tf.setBackground(solidBg(Theme.SURFACE, 8));
+        tf.setBorder(solidBorder(Theme.BORDER, 8));
+        tf.setPadding(new Insets(10, 14, 10, 14));
         tf.setPrefHeight(42);
         return tf;
     }
@@ -83,7 +146,10 @@ public final class UIFactory {
     public static PasswordField passwordField(String prompt) {
         PasswordField pf = new PasswordField();
         pf.setPromptText(prompt);
-        pf.setStyle(Theme.INPUT_STYLE);
+        pf.setFont(Theme.bodyFont(14));
+        pf.setBackground(solidBg(Theme.SURFACE, 8));
+        pf.setBorder(solidBorder(Theme.BORDER, 8));
+        pf.setPadding(new Insets(10, 14, 10, 14));
         pf.setPrefHeight(42);
         return pf;
     }
@@ -92,14 +158,18 @@ public final class UIFactory {
         TextArea ta = new TextArea();
         ta.setPromptText(prompt);
         ta.setPrefRowCount(rows);
-        ta.setStyle(Theme.INPUT_STYLE + "-fx-pref-row-count: " + rows + ";");
+        ta.setFont(Theme.bodyFont(14));
+        ta.setBackground(solidBg(Theme.SURFACE, 8));
+        ta.setBorder(solidBorder(Theme.BORDER, 8));
+        ta.setPadding(new Insets(10, 14, 10, 14));
         ta.setWrapText(true);
         return ta;
     }
 
     public static Label formLabel(String text) {
         Label lbl = new Label(text);
-        lbl.setStyle("-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        lbl.setFont(Theme.bodyFontBold(13));
+        lbl.setTextFill(Theme.TEXT_PRIMARY);
         return lbl;
     }
 
@@ -112,27 +182,33 @@ public final class UIFactory {
     public static VBox card(Node... children) {
         VBox card = new VBox(12);
         card.setPadding(new Insets(20));
-        card.setStyle(Theme.CARD_STYLE);
+        card.setBackground(solidBg(Theme.CARD, 12));
+        card.setEffect(cardShadow());
         card.getChildren().addAll(children);
         return card;
     }
 
     // ── Stat Cards ───────────────────────────────────────────────────────────────
-    public static VBox statCard(String value, String label, String color) {
+    public static VBox statCard(String value, String label, String colorHex) {
+        Color color = Color.web(colorHex);
+
         Label valLbl = new Label(value);
-        valLbl.setStyle("-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: " + color + ";");
+        valLbl.setFont(Theme.bodyFontBold(36));
+        valLbl.setTextFill(color);
 
         Label nameLbl = new Label(label);
-        nameLbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + ";");
+        nameLbl.setFont(Theme.bodyFont(13));
+        nameLbl.setTextFill(Theme.TEXT_SECONDARY);
 
         Rectangle bar = new Rectangle(40, 4);
-        bar.setFill(Color.web(color));
+        bar.setFill(color);
         bar.setArcWidth(4);
         bar.setArcHeight(4);
 
         VBox card = new VBox(8, bar, valLbl, nameLbl);
         card.setPadding(new Insets(20));
-        card.setStyle(Theme.CARD_STYLE);
+        card.setBackground(solidBg(Theme.CARD, 12));
+        card.setEffect(cardShadow());
         card.setPrefWidth(180);
         return card;
     }
@@ -140,57 +216,55 @@ public final class UIFactory {
     // ── Separator ────────────────────────────────────────────────────────────────
     public static Separator divider() {
         Separator sep = new Separator();
-        sep.setStyle("-fx-background-color: " + Theme.BORDER + ";");
+        sep.setBackground(solidBg(Theme.BORDER, 0));
         return sep;
     }
 
     // ── Badge ────────────────────────────────────────────────────────────────────
-    public static Label badge(String text, String bgColor) {
+    public static Label badge(String text, Color bgColor) {
         Label lbl = new Label(text);
-        lbl.setStyle(
-            "-fx-background-color: " + bgColor + "22;" +
-            "-fx-text-fill: " + bgColor + ";" +
-            "-fx-background-radius: 20;" +
-            "-fx-padding: 3 10 3 10;" +
-            "-fx-font-size: 11; -fx-font-weight: bold;"
-        );
+        // Warna background dengan opacity 13% (hex 22 ≈ 13%)
+        Color fadedBg = Color.color(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue(), 0.13);
+        lbl.setBackground(solidBg(fadedBg, 20));
+        lbl.setTextFill(bgColor);
+        lbl.setPadding(new Insets(3, 10, 3, 10));
+        lbl.setFont(Theme.bodyFontBold(11));
         return lbl;
     }
 
     // ── Navbar ───────────────────────────────────────────────────────────────────
     public static HBox navbar(String title, String username, String role, Runnable onLogout) {
         Label logo = new Label("DIVERYU26");
-        logo.setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: " + Theme.WHITE + "; -fx-letter-spacing: 3;");
+        logo.setFont(Theme.bodyFontBold(20));
+        logo.setTextFill(Theme.WHITE);
 
         Label titleLbl = new Label("/ " + title);
-        titleLbl.setStyle("-fx-font-size: 14; -fx-text-fill: " + Theme.ACCENT + ";");
+        titleLbl.setFont(Theme.bodyFont(14));
+        titleLbl.setTextFill(Theme.ACCENT);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Label userInfo = new Label(username);
-        userInfo.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.WHITE + "; -fx-font-weight: bold;");
+        userInfo.setFont(Theme.bodyFontBold(13));
+        userInfo.setTextFill(Theme.WHITE);
 
         Label roleBadge = badge(role, Theme.ACCENT);
 
         Button logoutBtn = new Button("Keluar");
-        logoutBtn.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-text-fill: " + Theme.WHITE + ";" +
-            "-fx-border-color: rgba(255,255,255,0.3);" +
-            "-fx-border-radius: 6;" +
-            "-fx-background-radius: 6;" +
-            "-fx-padding: 6 16 6 16;" +
-            "-fx-font-size: 12;" +
-            "-fx-cursor: hand;"
-        );
+        logoutBtn.setFont(Theme.bodyFont(12));
+        logoutBtn.setTextFill(Theme.WHITE);
+        logoutBtn.setBackground(solidBg(Color.TRANSPARENT, 6));
+        logoutBtn.setBorder(solidBorder(Color.rgb(255, 255, 255, 0.3), 6));
+        logoutBtn.setPadding(new Insets(6, 16, 6, 16));
+        logoutBtn.setCursor(javafx.scene.Cursor.HAND);
         logoutBtn.setOnAction(e -> onLogout.run());
 
         HBox nav = new HBox(12, logo, titleLbl, spacer, userInfo, roleBadge, logoutBtn);
         nav.setAlignment(Pos.CENTER_LEFT);
         nav.setPadding(new Insets(0, 24, 0, 24));
         nav.setPrefHeight(60);
-        nav.setStyle("-fx-background-color: " + Theme.NAV_BG + ";");
+        nav.setBackground(solidBg(Theme.NAV_BG, 0));
         return nav;
     }
 

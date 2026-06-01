@@ -6,5 +6,7 @@ public class Seller extends User {
     }
 
     @Override
-    public String getDashboardTitle() { return "Seller Dashboard"; }
+    public String getDashboardTitle() { 
+        return "Seller Dashboard"; 
+    }
 }

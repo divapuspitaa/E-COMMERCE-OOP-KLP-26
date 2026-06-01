@@ -1,24 +1,44 @@
 package proyek.p.auth;
 
-import javafx.animation.*;
-import javafx.geometry.*;
+import java.util.Optional;
+
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.ParallelTransition;
+import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.*;
-import javafx.scene.shape.*;
-import javafx.scene.text.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import proyek.p.App;
 import proyek.p.admin.AdminDashboard;
 import proyek.p.customer.CustomerDashboard;
-import proyek.p.model.*;
+import proyek.p.model.DataStore;
+import proyek.p.model.User;
 import proyek.p.seller.SellerDashboard;
 import proyek.p.ui.Theme;
 import proyek.p.ui.UIFactory;
-
-import java.util.Optional;
 
 public class LoginScreen {
     private final Stage stage;
@@ -60,33 +80,31 @@ public class LoginScreen {
         panel.setMinWidth(460);
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(60));
-        panel.setStyle("-fx-background-color: " + Theme.BLACK + ";");
+        panel.setBackground(new Background(new BackgroundFill(Theme.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // Decorative circles
         StackPane deco = new StackPane();
         Circle c1 = new Circle(160);
-        c1.setFill(Color.web(Theme.ACCENT + "15"));
+        c1.setFill(Color.web(Theme.ACCENT_HEX, 0.08));
         Circle c2 = new Circle(110);
-        c2.setFill(Color.web(Theme.ACCENT + "20"));
+        c2.setFill(Color.web(Theme.ACCENT_HEX, 0.12));
         c2.setTranslateX(40);
         c2.setTranslateY(-40);
 
         // Logo
         Label logo = new Label("DIVERYU26");
-        logo.setStyle(
-            "-fx-font-size: 48; -fx-font-weight: bold; " +
-            "-fx-text-fill: " + Theme.WHITE + "; " +
-            "-fx-letter-spacing: 6;"
-        );
+        logo.setFont(Theme.displayFont(48));
+        logo.setTextFill(Theme.WHITE);
 
         Label tagline = new Label("Platform E-Commerce\nTerpercaya Indonesia");
-        tagline.setStyle("-fx-font-size: 16; -fx-text-fill: rgba(255,255,255,0.6); -fx-text-alignment: center;");
+        tagline.setFont(Theme.bodyFont(16));
+        tagline.setTextFill(Color.rgb(255, 255, 255, 0.6));
         tagline.setTextAlignment(TextAlignment.CENTER);
         tagline.setAlignment(Pos.CENTER);
 
         // Teal accent line
         Rectangle accentLine = new Rectangle(60, 4);
-        accentLine.setFill(Color.web(Theme.ACCENT));
+        accentLine.setFill(Theme.ACCENT);
         accentLine.setArcWidth(4);
         accentLine.setArcHeight(4);
 
@@ -118,13 +136,12 @@ public class LoginScreen {
 
     private HBox chip(String icon, String label) {
         Label lbl = new Label(icon + " " + label);
-        lbl.setStyle(
-            "-fx-background-color: rgba(255,255,255,0.08);" +
-            "-fx-text-fill: rgba(255,255,255,0.8);" +
-            "-fx-background-radius: 20;" +
-            "-fx-padding: 6 14 6 14;" +
-            "-fx-font-size: 12;"
-        );
+        lbl.setFont(Theme.bodyFont(12));
+        lbl.setTextFill(Color.rgb(255, 255, 255, 0.8));
+        lbl.setBackground(new Background(new BackgroundFill(
+            Color.rgb(255, 255, 255, 0.08), new CornerRadii(20), Insets.EMPTY
+        )));
+        lbl.setPadding(new Insets(6, 14, 6, 14));
         HBox box = new HBox(lbl);
         return box;
     }
@@ -134,10 +151,11 @@ public class LoginScreen {
         VBox panel = new VBox();
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(60, 80, 60, 80));
-        panel.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
+        panel.setBackground(new Background(new BackgroundFill(Theme.SURFACE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Label title = new Label("Selamat Datang");
-        title.setStyle("-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        title.setFont(Theme.bodyFontBold(32));
+        title.setTextFill(Theme.TEXT_PRIMARY);
 
         Label subtitle = UIFactory.bodyText("Masuk ke akun Anda untuk melanjutkan");
         subtitle.setPadding(new Insets(0, 0, 24, 0));
@@ -149,7 +167,8 @@ public class LoginScreen {
         passwordField.setPrefWidth(380);
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: " + Theme.DANGER + "; -fx-font-size: 13;");
+        errorLabel.setFont(Theme.bodyFont(13));
+        errorLabel.setTextFill(Theme.DANGER);
         errorLabel.setVisible(false);
 
         Button loginBtn = UIFactory.primaryBtn("Masuk");
@@ -211,14 +230,15 @@ public class LoginScreen {
             "• budi_seller / budi123  (Seller)\n" +
             "• andi_buy / andi123  (Customer)"
         );
-        hint.setStyle(
-            "-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";" +
-            "-fx-background-color: rgba(0,194,168,0.06);" +
-            "-fx-background-radius: 8;" +
-            "-fx-padding: 12 14 12 14;" +
-            "-fx-border-color: rgba(0,194,168,0.2);" +
-            "-fx-border-radius: 8;"
-        );
+        hint.setFont(Theme.bodyFont(11));
+        hint.setTextFill(Theme.TEXT_MUTED);
+        hint.setBackground(new Background(new BackgroundFill(
+            Color.web(Theme.ACCENT_HEX, 0.06), new CornerRadii(8), Insets.EMPTY
+        )));
+        hint.setPadding(new Insets(12, 14, 12, 14));
+        hint.setBorder(new Border(new BorderStroke(
+            Color.web(Theme.ACCENT_HEX, 0.2), BorderStrokeStyle.SOLID, new CornerRadii(8), new BorderWidths(1)
+        )));
         VBox box = new VBox(hint);
         box.setPadding(new Insets(16, 0, 0, 0));
         return box;

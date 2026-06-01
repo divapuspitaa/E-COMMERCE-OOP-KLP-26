@@ -12,8 +12,8 @@ public class App extends Application {
     public void start(Stage stage) {
         primaryStage = stage;
         stage.setTitle("DIVERYU26 — E-Commerce Platform");
-        stage.setMinWidth(1100);
-        stage.setMinHeight(720);
+        stage.setMinWidth(900);
+        stage.setMinHeight(600);
         showLogin();
     }
 
@@ -23,5 +23,7 @@ public class App extends Application {
         new LoginScreen(primaryStage).show();
     }
 
-    public static void main(String[] args) { launch(args); }
+    public static void main(String[] args) { 
+        launch(args); 
+    }
 }

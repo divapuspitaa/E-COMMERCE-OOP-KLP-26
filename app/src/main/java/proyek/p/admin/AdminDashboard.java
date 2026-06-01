@@ -18,11 +18,19 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import proyek.p.App;
@@ -48,7 +56,7 @@ public class AdminDashboard {
         root.setTop(UIFactory.navbar("Admin Dashboard", admin.getUsername(), "ADMIN", App::showLogin));
         root.setLeft(buildSidebar(root));
         root.setCenter(buildMainContent());
-        root.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
+        root.setBackground(new Background(new BackgroundFill(Theme.SURFACE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Scene scene = new Scene(root, 1200, 760);
         stage.setScene(scene);
@@ -64,11 +72,10 @@ public class AdminDashboard {
     private VBox buildSidebar(BorderPane root) {
         VBox sidebar = new VBox();
         sidebar.setPrefWidth(220);
-        sidebar.setStyle(
-            "-fx-background-color: " + Theme.WHITE + ";" +
-            "-fx-border-color: " + Theme.BORDER + ";" +
-            "-fx-border-width: 0 1 0 0;"
-        );
+        sidebar.setBackground(new Background(new BackgroundFill(Theme.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+        sidebar.setBorder(new Border(new BorderStroke(
+            Theme.BORDER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 1, 0, 0)
+        )));
         sidebar.setPadding(new Insets(24, 0, 24, 0));
 
         String[] labels = { "📊  Overview", "👥  Kelola Seller", "🛒  Kelola Customer",
@@ -99,7 +106,7 @@ public class AdminDashboard {
     private ScrollPane wrapScroll(javafx.scene.Node content) {
         ScrollPane sp = new ScrollPane(content);
         sp.setFitToWidth(true);
-        sp.setStyle("-fx-background-color: " + Theme.SURFACE + "; -fx-background: " + Theme.SURFACE + ";");
+        sp.setBackground(new Background(new BackgroundFill(Theme.SURFACE, new CornerRadii(0), Insets.EMPTY)));
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         return sp;
     }
@@ -111,14 +118,28 @@ public class AdminDashboard {
         btn.setPrefHeight(48);
         btn.setAlignment(Pos.CENTER_LEFT);
         btn.setPadding(new Insets(0, 0, 0, 24));
-        String base = "-fx-background-color: transparent; -fx-font-size: 14; -fx-text-fill: "
-                    + Theme.TEXT_SECONDARY + "; -fx-cursor: hand; -fx-background-radius: 0;";
-        String selected = "-fx-background-color: rgba(0,194,168,0.08); -fx-font-size: 14; -fx-text-fill: "
-                    + Theme.ACCENT + "; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 0;"
-                    + "-fx-border-color: transparent transparent transparent " + Theme.ACCENT
-                    + "; -fx-border-width: 0 0 0 3;";
-        btn.setStyle(base);
-        btn.selectedProperty().addListener((obs, o, nw) -> btn.setStyle(nw ? selected : base));
+        btn.setCursor(javafx.scene.Cursor.HAND);
+        btn.setFont(Theme.bodyFont(14));
+        btn.setTextFill(Theme.TEXT_SECONDARY);
+        btn.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        btn.selectedProperty().addListener((obs, o, isSelected) -> {
+            if (isSelected) {
+                btn.setTextFill(Theme.ACCENT);
+                btn.setFont(Theme.bodyFontBold(14));
+                btn.setBackground(new Background(new BackgroundFill(
+                    Color.rgb(0, 194, 168, 0.08), CornerRadii.EMPTY, Insets.EMPTY
+                )));
+                btn.setBorder(new Border(new BorderStroke(
+                    Theme.ACCENT, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 0, 3)
+                )));
+            } else {
+                btn.setTextFill(Theme.TEXT_SECONDARY);
+                btn.setFont(Theme.bodyFont(14));
+                btn.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
+                btn.setBorder(Border.EMPTY);
+            }
+        });
         return btn;
     }
 
@@ -142,11 +163,11 @@ public class AdminDashboard {
         Label subtitle = UIFactory.bodyText("Kelola platform DIVERYU26 dari satu tempat.");
 
         HBox stats = new HBox(16,
-            UIFactory.statCard(String.valueOf(totalUsers),    "Total Pengguna",  Theme.ACCENT),
+            UIFactory.statCard(String.valueOf(totalUsers), "Total Pengguna", Theme.ACCENT_HEX),
             UIFactory.statCard(String.valueOf(adminCount),    "Total Admin",     "#E11D48"),
-            UIFactory.statCard(String.valueOf(sellerCount),   "Total Seller",    Theme.TEXT_PRIMARY),
+            UIFactory.statCard(String.valueOf(sellerCount), "Total Seller", Theme.TEXT_PRIMARY_HEX),
             UIFactory.statCard(String.valueOf(customerCount), "Total Customer",  "#6366F1"),
-            UIFactory.statCard(String.valueOf(productCount),  "Total Produk",    Theme.WARNING)
+            UIFactory.statCard(String.valueOf(productCount), "Total Produk", Theme.WARNING_HEX)
         );
         stats.setAlignment(Pos.CENTER_LEFT);
 
@@ -166,13 +187,15 @@ public class AdminDashboard {
 
     private HBox activityItem(String icon, String text, String time) {
         Label iconLbl = new Label(icon);
-        iconLbl.setStyle("-fx-font-size: 18;");
+        iconLbl.setFont(Theme.bodyFont(18));
         Label textLbl = new Label(text);
-        textLbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        textLbl.setFont(Theme.bodyFont(13));
+        textLbl.setTextFill(Theme.TEXT_PRIMARY);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         Label timeLbl = new Label(time);
-        timeLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        timeLbl.setFont(Theme.bodyFont(11));
+        timeLbl.setTextFill(Theme.TEXT_MUTED);
         HBox row = new HBox(12, iconLbl, textLbl, spacer, timeLbl);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(8, 0, 8, 0));
@@ -206,7 +229,7 @@ public class AdminDashboard {
     @SuppressWarnings("unchecked")
     private TableView<User> buildUserTable(List<User> users, boolean isSeller) {
         TableView<User> table = new TableView<>();
-        table.setStyle("-fx-font-size: 13;");
+        table.setRowFactory(tv -> { javafx.scene.control.TableRow<Object> row = new javafx.scene.control.TableRow<>(); row.setFont(Theme.bodyFont(13)); return (javafx.scene.control.TableRow) row; });
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setPrefHeight(400);
 
@@ -272,7 +295,7 @@ public class AdminDashboard {
         panel.setPadding(new Insets(32));
 
         TableView<Product> table = new TableView<>();
-        table.setStyle("-fx-font-size: 13;");
+        table.setRowFactory(tv -> { javafx.scene.control.TableRow<Object> row = new javafx.scene.control.TableRow<>(); row.setFont(Theme.bodyFont(13)); return (javafx.scene.control.TableRow) row; });
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setPrefHeight(460);
 
@@ -322,7 +345,7 @@ public class AdminDashboard {
         );
 
         TableView<User> table = new TableView<>();
-        table.setStyle("-fx-font-size: 13;");
+        table.setRowFactory(tv -> { javafx.scene.control.TableRow<Object> row = new javafx.scene.control.TableRow<>(); row.setFont(Theme.bodyFont(13)); return (javafx.scene.control.TableRow) row; });
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setPrefHeight(400);
 
@@ -362,10 +385,10 @@ public class AdminDashboard {
                 if (empty) { setGraphic(null); return; }
                 User u = getTableView().getItems().get(getIndex());
 
-                // Cannot delete yourself
                 if (u.getId().equals(admin.getId())) {
                     Label selfLabel = new Label("(Akun Anda)");
-                    selfLabel.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+                    selfLabel.setFont(Theme.bodyFont(12));
+                    selfLabel.setTextFill(Theme.TEXT_MUTED);
                     setGraphic(selfLabel);
                     return;
                 }
@@ -373,7 +396,7 @@ public class AdminDashboard {
                 boolean canDelete = store.canAdminDelete(admin.getId(), u.getId());
                 deleteBtn.setDisable(!canDelete);
                 if (!canDelete) {
-                    deleteBtn.setStyle(deleteBtn.getStyle() + "-fx-opacity: 0.4;");
+                    deleteBtn.setOpacity(0.4);
                     Tooltip.install(deleteBtn, new Tooltip("Hanya admin dengan ID lebih rendah yang bisa menghapus"));
                 }
 
@@ -427,23 +450,22 @@ public class AdminDashboard {
         Button saveUsernameBtn = UIFactory.accentBtn("Simpan Username");
         saveUsernameBtn.setPrefWidth(400);
         Label usernameMsg = new Label();
-        usernameMsg.setStyle("-fx-font-size: 12;");
+        usernameMsg.setFont(Theme.bodyFont(12));
 
         saveUsernameBtn.setOnAction(e -> {
             String newName = newUsernameField.getText().trim();
             if (newName.length() < 4) {
-                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                usernameMsg.setTextFill(Theme.DANGER);
                 usernameMsg.setText("Username minimal 4 karakter.");
                 return;
             }
             if (store.updateUsername(admin.getId(), newName)) {
                 admin.setUsername(newName);
-                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.SUCCESS + ";");
+                usernameMsg.setTextFill(Theme.SUCCESS);
                 usernameMsg.setText("✅ Username berhasil diperbarui.");
-                // Update navbar
                 show();
             } else {
-                usernameMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                usernameMsg.setTextFill(Theme.DANGER);
                 usernameMsg.setText("Username sudah digunakan.");
             }
         });
@@ -467,7 +489,7 @@ public class AdminDashboard {
         Button savePassBtn = UIFactory.accentBtn("Simpan Kata Sandi");
         savePassBtn.setPrefWidth(400);
         Label passMsg = new Label();
-        passMsg.setStyle("-fx-font-size: 12;");
+        passMsg.setFont(Theme.bodyFont(12));
 
         savePassBtn.setOnAction(e -> {
             String current = currentPassField.getText();
@@ -475,23 +497,23 @@ public class AdminDashboard {
             String confirm  = confirmPassField.getText();
 
             if (!admin.getPassword().equals(current)) {
-                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setTextFill(Theme.DANGER);
                 passMsg.setText("Kata sandi saat ini tidak cocok.");
                 return;
             }
             if (newPass.length() < 6) {
-                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setTextFill(Theme.DANGER);
                 passMsg.setText("Kata sandi baru minimal 6 karakter.");
                 return;
             }
             if (!newPass.equals(confirm)) {
-                passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.DANGER + ";");
+                passMsg.setTextFill(Theme.DANGER);
                 passMsg.setText("Konfirmasi kata sandi tidak cocok.");
                 return;
             }
             store.updatePassword(admin.getId(), newPass);
             admin.setPassword(newPass);
-            passMsg.setStyle("-fx-font-size: 12; -fx-text-fill: " + Theme.SUCCESS + ";");
+            passMsg.setTextFill(Theme.SUCCESS);
             passMsg.setText("✅ Kata sandi berhasil diperbarui.");
             currentPassField.clear();
             newPassField.clear();
@@ -508,7 +530,6 @@ public class AdminDashboard {
             savePassBtn
         );
 
-        // Info card
         VBox infoCard = UIFactory.card(
             profileItem("👤", "Username", admin.getUsername()),
             profileItem("🔑", "Role", "ADMIN"),
@@ -521,11 +542,14 @@ public class AdminDashboard {
 
     private HBox profileItem(String icon, String label, String value) {
         Label iconLbl = new Label(icon);
-        iconLbl.setStyle("-fx-font-size: 16;");
+        iconLbl.setFont(Theme.bodyFont(16));
         Label labelLbl = new Label(label + ":");
-        labelLbl.setStyle("-fx-font-size: 13; -fx-text-fill: " + Theme.TEXT_SECONDARY + "; -fx-min-width: 100;");
+        labelLbl.setFont(Theme.bodyFont(13));
+        labelLbl.setTextFill(Theme.TEXT_SECONDARY);
+        labelLbl.setMinWidth(100);
         Label valueLbl = new Label(value);
-        valueLbl.setStyle("-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        valueLbl.setFont(Theme.bodyFontBold(13));
+        valueLbl.setTextFill(Theme.TEXT_PRIMARY);
         HBox row = new HBox(12, iconLbl, labelLbl, valueLbl);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(6, 0, 6, 0));

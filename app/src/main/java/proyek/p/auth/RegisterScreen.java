@@ -1,16 +1,38 @@
 package proyek.p.auth;
 
-import javafx.animation.*;
-import javafx.geometry.*;
+import javafx.animation.FadeTransition;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import proyek.p.App;
-import proyek.p.model.*;
+import proyek.p.model.Admin;
+import proyek.p.model.Customer;
+import proyek.p.model.DataStore;
+import proyek.p.model.Seller;
+import proyek.p.model.User;
 import proyek.p.ui.Theme;
 import proyek.p.ui.UIFactory;
 
@@ -24,7 +46,7 @@ public class RegisterScreen {
     public void show() {
         VBox root = buildRoot();
         root.setOpacity(0);
-        Scene scene = new Scene(root, 1100, 720);
+        Scene scene = new Scene(root, 900, 650);
         stage.setScene(scene);
 
         FadeTransition ft = new FadeTransition(Duration.millis(400), root);
@@ -38,20 +60,25 @@ public class RegisterScreen {
         header.setPadding(new Insets(0, 24, 0, 24));
         header.setPrefHeight(60);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-background-color: " + Theme.BLACK + ";");
+        header.setBackground(new Background(new BackgroundFill(Theme.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
         Label logo = new Label("DIVERYU26");
-        logo.setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: " + Theme.WHITE + "; -fx-letter-spacing: 3;");
+        logo.setFont(Theme.bodyFontBold(20));
+        logo.setTextFill(Theme.WHITE);
 
         Label slash = new Label(" / Daftarkan Akun");
-        slash.setStyle("-fx-font-size: 14; -fx-text-fill: " + Theme.ACCENT + ";");
+        slash.setFont(Theme.bodyFont(14));
+        slash.setTextFill(Theme.ACCENT);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Button backBtn = UIFactory.outlineBtn("← Kembali");
-        backBtn.setStyle(backBtn.getStyle().replace(Theme.BLACK, Theme.WHITE).replace(Theme.BLACK, Theme.WHITE) +
-            "-fx-text-fill: " + Theme.WHITE + "; -fx-border-color: rgba(255,255,255,0.3);");
+        backBtn.setTextFill(Theme.WHITE);
+        backBtn.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(8), Insets.EMPTY)));
+        backBtn.setBorder(new Border(new BorderStroke(
+            Color.rgb(255, 255, 255, 0.3), BorderStrokeStyle.SOLID, new CornerRadii(8), new BorderWidths(1)
+        )));
         backBtn.setOnAction(e -> App.showLogin());
 
         header.getChildren().addAll(logo, slash, spacer, backBtn);
@@ -60,19 +87,27 @@ public class RegisterScreen {
         HBox content = new HBox(40);
         content.setAlignment(Pos.TOP_CENTER);
         content.setPadding(new Insets(50, 80, 50, 80));
-        content.setStyle("-fx-background-color: " + Theme.SURFACE + ";");
-        VBox.setVgrow(content, Priority.ALWAYS);
+        content.setBackground(new Background(new BackgroundFill(Theme.SURFACE, CornerRadii.EMPTY, Insets.EMPTY)));
 
         content.getChildren().addAll(buildFormCard());
 
-        VBox root = new VBox(header, content);
+        ScrollPane scrollPane = new ScrollPane(content);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setBackground(new Background(new BackgroundFill(Theme.SURFACE, CornerRadii.EMPTY, Insets.EMPTY)));
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        VBox root = new VBox(header, scrollPane);
         return root;
     }
 
     private VBox buildFormCard() {
         // Title section
         Label title = new Label("Buat Akun Baru");
-        title.setStyle("-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        title.setFont(Theme.bodyFontBold(28));
+        title.setTextFill(Theme.TEXT_PRIMARY);
 
         Label subtitle = UIFactory.bodyText("Isi data di bawah ini untuk membuat akun Anda");
         subtitle.setPadding(new Insets(0, 0, 16, 0));
@@ -115,7 +150,8 @@ public class RegisterScreen {
         });
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: " + Theme.DANGER + "; -fx-font-size: 13;");
+        errorLabel.setFont(Theme.bodyFont(13));
+        errorLabel.setTextFill(Theme.DANGER);
         errorLabel.setVisible(false);
 
         Button registerBtn = UIFactory.accentBtn("Buat Akun");
@@ -190,11 +226,13 @@ public class RegisterScreen {
 
     private ToggleButton roleCard(String icon, String name, String desc, User.Role role, ToggleGroup group) {
         Label iconLbl = new Label(icon);
-        iconLbl.setStyle("-fx-font-size: 22;");
+        iconLbl.setFont(Theme.bodyFont(22));
         Label nameLbl = new Label(name);
-        nameLbl.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: " + Theme.TEXT_PRIMARY + ";");
+        nameLbl.setFont(Theme.bodyFontBold(14));
+        nameLbl.setTextFill(Theme.TEXT_PRIMARY);
         Label descLbl = new Label(desc);
-        descLbl.setStyle("-fx-font-size: 11; -fx-text-fill: " + Theme.TEXT_MUTED + ";");
+        descLbl.setFont(Theme.bodyFont(11));
+        descLbl.setTextFill(Theme.TEXT_MUTED);
         descLbl.setWrapText(true);
 
         VBox content = new VBox(4, iconLbl, nameLbl, descLbl);
@@ -205,16 +243,27 @@ public class RegisterScreen {
         btn.setUserData(role);
         btn.setToggleGroup(group);
         btn.setPrefSize(128, 90);
-        String base = "-fx-background-color: " + Theme.WHITE + ";" +
-            "-fx-background-radius: 10;" +
-            "-fx-border-color: " + Theme.BORDER + ";" +
-            "-fx-border-radius: 10;" +
-            "-fx-cursor: hand;" +
-            "-fx-padding: 12;";
-        btn.setStyle(base);
+        btn.setPadding(new Insets(12));
+        btn.setCursor(javafx.scene.Cursor.HAND);
+        btn.setBackground(new Background(new BackgroundFill(Theme.WHITE, new CornerRadii(10), Insets.EMPTY)));
+        btn.setBorder(new Border(new BorderStroke(
+            Theme.BORDER, BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1)
+        )));
+
         btn.selectedProperty().addListener((obs, old, nw) -> {
-            if (nw) btn.setStyle(base + "-fx-border-color: " + Theme.ACCENT + "; -fx-background-color: rgba(0,194,168,0.05);");
-            else    btn.setStyle(base);
+            if (nw) {
+                btn.setBackground(new Background(new BackgroundFill(
+                    Color.web(Theme.ACCENT_HEX, 0.05), new CornerRadii(10), Insets.EMPTY
+                )));
+                btn.setBorder(new Border(new BorderStroke(
+                    Theme.ACCENT, BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1)
+                )));
+            } else {
+                btn.setBackground(new Background(new BackgroundFill(Theme.WHITE, new CornerRadii(10), Insets.EMPTY)));
+                btn.setBorder(new Border(new BorderStroke(
+                    Theme.BORDER, BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1)
+                )));
+            }
         });
         return btn;
     }
