@@ -59,12 +59,14 @@ gradlew.bat run
 ---
 
 ## Struktur Paket
+
+```text
 app/src/main/java/proyek/p/
 
 ├── App.java                    ← Entry point
 │
 ├── model/
-│   ├── User.java               ← Abstract base class (OOP: inheritance)
+│   ├── User.java               ← Abstract base class (OOP: Inheritance)
 │   ├── Admin.java
 │   ├── Seller.java
 │   ├── Customer.java
@@ -73,10 +75,10 @@ app/src/main/java/proyek/p/
 │   └── DataStore.java          ← Singleton in-memory storage
 │
 ├── controller/
-│   ├── AuthController.java     ← Business logic autentikasi
-│   ├── UserController.java     ← Business logic manajemen user
-│   ├── ProductController.java  ← Business logic produk
-│   └── TransactionController.java ← Business logic transaksi
+│   ├── AuthController.java     ← Mengelola autentikasi
+│   ├── UserController.java     ← Mengelola data pengguna
+│   ├── ProductController.java  ← Mengelola data produk
+│   └── TransactionController.java ← Mengelola transaksi
 │
 ├── dao/
 │   ├── UserDAO.java            ← Akses data user
@@ -99,7 +101,7 @@ app/src/main/java/proyek/p/
 └── ui/
     ├── Theme.java              ← Design tokens
     └── UIFactory.java          ← Reusable UI components
-    
+```    
 ## Konsep OOP yang Digunakan
 1. Inheritance — Admin, Seller, Customer extends User
 2. Abstraction — User adalah abstract class sebagai kerangka dasar seluruh jenis pengguna
