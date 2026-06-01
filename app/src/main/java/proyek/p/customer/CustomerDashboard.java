@@ -572,6 +572,13 @@ public class CustomerDashboard {
         VBox panel = new VBox(24);
         panel.setPadding(new Insets(32));
 
+        // Tombol Back
+        Button btnBack = UIFactory.outlineBtn("← Kembali ke Beranda");
+        btnBack.setOnAction(e -> {
+            BorderPane bp = (BorderPane) stage.getScene().getRoot();
+            bp.setCenter(wrapScroll(buildShopPanel()));
+        });
+
         Label title    = UIFactory.heading("📋 Riwayat Pembelian");
         Label subtitle = UIFactory.bodyText("Semua transaksi yang pernah Anda lakukan.");
 
@@ -595,7 +602,7 @@ public class CustomerDashboard {
             emptyMsg.setTextFill(Theme.TEXT_MUTED);
             Label emptyHint = UIFactory.caption("Mulai belanja dan riwayat akan muncul di sini.");
             emptyBox.getChildren().addAll(emptyIcon, emptyMsg, emptyHint);
-            panel.getChildren().addAll(title, subtitle, stats, emptyBox);
+            panel.getChildren().addAll(btnBack, title, subtitle, stats, emptyBox);
             return panel;
         }
 
@@ -604,7 +611,7 @@ public class CustomerDashboard {
             txCards.getChildren().add(buildTransactionCard(tx));
         }
 
-        panel.getChildren().addAll(title, subtitle, stats, txCards);
+        panel.getChildren().addAll(btnBack, title, subtitle, stats, txCards);
         return panel;
     }
 
