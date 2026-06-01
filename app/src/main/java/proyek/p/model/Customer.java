@@ -6,5 +6,7 @@ public class Customer extends User {
     }
 
     @Override
-    public String getDashboardTitle() { return "Customer Dashboard"; }
+    public String getDashboardTitle() { 
+        return "Customer Dashboard"; 
+    }
 }

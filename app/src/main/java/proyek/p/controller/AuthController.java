@@ -1,12 +1,12 @@
 package proyek.p.controller;
 
+import java.util.Optional;
+
 import proyek.p.dao.UserDAO;
 import proyek.p.model.Admin;
 import proyek.p.model.Customer;
 import proyek.p.model.Seller;
 import proyek.p.model.User;
-
-import java.util.Optional;
 
 /**
  * Controller yang menangani logika autentikasi:
